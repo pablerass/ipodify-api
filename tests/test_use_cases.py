@@ -6,9 +6,11 @@ from ipodify_api.model.playlist import Playlist
 
 from ipodify_api.use_cases import AddPlaylistUseCase, GetPlaylistsUseCase, RemovePlaylistUseCase
 
+
 @pytest.fixture
 def user_collection():
     return UserCollection()
+
 
 def test_playlist_use_cases(user_collection):
     add_playlist = AddPlaylistUseCase(user_collection)

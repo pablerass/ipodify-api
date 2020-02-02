@@ -10,6 +10,14 @@ class BaseUseCase(object):
         self._logger = logging.getLogger(f"use_cases.{self.__class__.__name__}")
 
 
+class UserCollectionUseCase(BaseUseCase):
+    def __init__(self, user_collection):
+        self.__user_collection = user_collection
+
+    def get_user(self, user_name):
+        return self.__user_collection.load_user(user_name)
+
+
 def filter_track(track):
     album = track.get('album')
     artists = track.get('artists')
@@ -43,27 +51,25 @@ class GetLibraryUseCase(BaseUseCase):
         return {'tracks': tracks}
 
 
-class GetPlaylistsUseCase(BaseUseCase):
+class GetPlaylistsUseCase(UserCollectionUseCase):
     def __init__(self, user_collection):
-        self.__user_collection = user_collection
+        super().__init__(user_collection)
 
     def execute(self, user_name):
-        user = self.__user_collection.load_user(user_name)
-        return user.playlists
+        return self.get_user(user_name).playlists
 
-class AddPlaylistUseCase(BaseUseCase):
+class AddPlaylistUseCase(UserCollectionUseCase):
     def __init__(self, user_collection):
-        self.__user_collection = user_collection
+        super().__init__(user_collection)
 
     def execute(self, user_name, playlist):
-        user = self.__user_collection.load_user(user_name)
-        return user.add_playlist(playlist)
+        return self.get_user(user_name).add_playlist(playlist)
 
-class RemovePlaylistUseCase(BaseUseCase):
+
+class RemovePlaylistUseCase(UserCollectionUseCase):
     def __init__(self, user_collection):
-        self.__user_collection = user_collection
+        super().__init__(user_collection)
 
     def execute(self, user_name, playlist):
-        user = self.__user_collection.load_user(user_name)
-        return user.remove_playlist(playlist)
+        return self.get_user(user_name).remove_playlist(playlist)
 

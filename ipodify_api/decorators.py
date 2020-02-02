@@ -28,8 +28,6 @@ def inject(*iargs, **ikwargs):
         def wrapper(*args, **kwargs):
             nargs = args + iargs
             nkwargs = {**kwargs, **ikwargs}
-            print(nargs)
-            print(nkwargs)
             return func(*nargs, **nkwargs)
         return wrapper
     return caller

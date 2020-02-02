@@ -48,19 +48,22 @@ class GetPlaylistsUseCase(BaseUseCase):
         self.__user_collection = user_collection
 
     def execute(self, user_name):
-        return self.__user_collection.load_user(user_name).playlists
+        user = self.__user_collection.load_user(user_name)
+        return user.playlists
 
 class AddPlaylistUseCase(BaseUseCase):
     def __init__(self, user_collection):
         self.__user_collection = user_collection
 
     def execute(self, user_name, playlist):
-        return self.__user_collection.load_user(user_name).add_playlist(playlist)
+        user = self.__user_collection.load_user(user_name)
+        return user.add_playlist(playlist)
 
 class RemovePlaylistUseCase(BaseUseCase):
     def __init__(self, user_collection):
         self.__user_collection = user_collection
 
     def execute(self, user_name, playlist):
-        return self.__user_collection.load_user(user_name).remove_playlist(playlist)
+        user = self.__user_collection.load_user(user_name)
+        return user.remove_playlist(playlist)
 

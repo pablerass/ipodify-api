@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 
+from functools import wraps
 from flask import request
 
 from .model.user import RequestUser
@@ -9,6 +10,7 @@ from . import constants
 
 
 def auth(func):
+    @wraps(func)
     def wrapper():
         auth_header = {'Authorization': request.headers.get('Authorization')}
         me = f"{constants.SPOTIFY_API_URL}/v1/me"
@@ -17,7 +19,17 @@ def auth(func):
         # TODO: Return error when error
         user_data = r.json()
         return func(RequestUser(user_data['id'], auth_header))
-
-    # Renaming the function name to solve issues with flask
-    wrapper.__name__ = func.__name__
     return wrapper
+
+
+def inject(*iargs, **ikwargs):
+    def caller(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            nargs = args + iargs
+            nkwargs = {**kwargs, **ikwargs}
+            print(nargs)
+            print(nkwargs)
+            return func(*nargs, **nkwargs)
+        return wrapper
+    return caller

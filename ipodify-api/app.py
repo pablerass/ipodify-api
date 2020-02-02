@@ -3,7 +3,7 @@ import logging
 
 from flask import Flask
 
-from .decorators import auth
+from .decorators import auth, inject
 from .model.user import UserCollection
 from .model.playlist import Playlist
 from .use_cases import GetLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase
@@ -12,16 +12,22 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 user_collection = UserCollection()
+add_playlist_uc = AddPlaylistUseCase(user_collection)
+get_playlist_uc = GetPlaylistsUseCase(user_collection)
+get_library_uc = GetLibraryUseCase()
+
 
 @app.route('/library', methods=['GET'])
 @auth
-def get_library(user):
-    return GetLibraryUseCase().execute(user)
+@inject(get_library_uc)
+def get_library(user, get_library_use_case):
+    return get_library_use_caseexecute(user)
 
 @app.route('/playlists', methods=['GET'])
 @auth
-def get_playlists(user):
-    playlists = GetPlaylistsUseCase(user_collection).execute(user.name)
+@inject(get_playlist_uc)
+def get_playlists(user, get_playlist_use_case):
+    playlists = get_playlist_use_case.execute(user.name)
     print(playlists)
     return {
         'playlists': []
@@ -29,12 +35,7 @@ def get_playlists(user):
 
 @app.route('/playlists', methods=['POST'])
 @auth
-def add_playlists(user):
-    AddPlaylistUseCase(user_collection).execute(user.name, Playlist("aaaa"))
+@inject(add_playlist_uc)
+def add_playlists(user, add_playlist_use_case):
+    add_playlis_use_case.execute(user.name, Playlist("aaaa"))
     return ""
-
-
-@app.route('/nothing', methods=['GET'])
-@auth
-def nothing(user):
-    return user.name

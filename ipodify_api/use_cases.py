@@ -41,7 +41,7 @@ class GetLibraryUseCase(BaseUseCase):
     def execute(self, user):
         tracks = []
         next_page = f"{self.__spotify_api_url}/v1/me/tracks?offset=0&limit={constants.SPOTIFY_LIMIT}"
-        while not next_page is None:
+        while next_page is not None:
             r = requests.get(next_page, headers=user.auth_header)
             r_content = r.json()
             r.raise_for_status()
@@ -58,6 +58,7 @@ class GetPlaylistsUseCase(UserCollectionUseCase):
     def execute(self, user_name):
         return self.get_user(user_name).playlists
 
+
 class AddPlaylistUseCase(UserCollectionUseCase):
     def __init__(self, user_collection):
         super().__init__(user_collection)
@@ -72,4 +73,3 @@ class RemovePlaylistUseCase(UserCollectionUseCase):
 
     def execute(self, user_name, playlist):
         return self.get_user(user_name).remove_playlist(playlist)
-

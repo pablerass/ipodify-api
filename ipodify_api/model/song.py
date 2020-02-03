@@ -29,11 +29,11 @@ class SongSource(object):
             'service': self.__service,
             'uri': self.__uri,
         }
-        if not self.__href is None:
+        if self.__href is not None:
             d.update({
                 'href': self.__href
             })
-        if not self.__url is None:
+        if self.__url is not None:
             d.update({
                 'url': self.__url
             })
@@ -59,7 +59,7 @@ class SongFactory(object):
             'sources': [
                 SongSource('spotify', uri=track.get('uri'), href=track.get('href'),
                            url=track.get('external_urls').get('spotify'))
-            ]
+            ],
             'name': track.get('name'),
             'isrc': track.get('external_ids').get('isrc'),
             'country': track.get('external_ids').get('isrc')[0:2],

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import logging
 
 
 class RequestUser(object):
@@ -21,7 +20,7 @@ class UserCollection(object):
         self.__users = {}
 
     def load_user(self, user_name):
-        if not user_name in self.__users:
+        if user_name not in self.__users:
             self.__users[user_name] = User(user_name)
         return self.__users[user_name]
 

@@ -23,18 +23,20 @@ get_library_uc = GetLibraryUseCase()
 def get_library(user, get_library_use_case):
     return get_library_use_case.execute(user)
 
+
 @app.route('/playlists', methods=['GET'])
 @auth
 @inject(get_playlist_uc)
 def get_playlists(user, get_playlist_use_case):
     playlists = get_playlist_use_case.execute(user.name)
     return {
-        'playlists': []
+        'playlists': playlists
     }
+
 
 @app.route('/playlists', methods=['POST'])
 @auth
 @inject(add_playlist_uc)
 def add_playlists(user, add_playlist_use_case):
-    add_playlis_use_case.execute(user.name, Playlist("aaaa"))
+    add_playlist_use_case.execute(user.name, Playlist("aaaa"))
     return ""

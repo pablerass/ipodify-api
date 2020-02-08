@@ -11,15 +11,16 @@ class Playlist(object):
             'name': self.__name,
         }
 
-    def __key(self):
+    @property
+    def id(self):
         return (self.__name)
 
     def __hash__(self):
-        return hash(self.__key())
+        return hash(self.id)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.__key() == other.__key()
+            return self.id == other.id
         return NotImplemented
 
 

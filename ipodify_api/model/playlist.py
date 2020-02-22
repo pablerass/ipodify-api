@@ -1,28 +1,43 @@
 # -*- coding: utf-8 -*-
 
+from typing import List
 
-class Playlist(object):
-    # TODO: Make this class json serializable
-    def __init__(self, name, filters=None):
+from . import Hasheable
+from .user import User
+
+
+class PlaylistFilter(Hasheable):
+    pass
+
+
+class Playlist(Hasheable):
+    def __init__(self, name: str, user: User, filters: List[PlaylistFilter] = None):
+        self.__user = user
         self.__name = name
+        if filters is None:
+            self.__filters = []
 
     def __dict__(self):
         return {
             'name': self.__name,
+            'filters': self.__filters
         }
+
+    def __repr__(self):
+        return str(self.__dict__())
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def user(self):
+        return self.__user
 
     @property
     def id(self):
-        return (self.__name)
+        return self.user.id + ':' + self.__name
 
-    def __hash__(self):
-        return hash(self.id)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.id == other.id
-        return NotImplemented
-
-
-class PlaylistFilter(object):
-    pass
+    @staticmethod
+    def get_id(name, user: User):
+        return Playlist(name, user).id

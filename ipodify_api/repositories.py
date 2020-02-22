@@ -2,7 +2,16 @@
 from collections import defaultdict
 
 
-class MemoryRepo(object):
+# TODO: Move filter branch to Filterable entity class?
+def filter_match(_filter, entity):
+    for _property, value in _filter.items():
+        if getattr(entity, _property) != value:
+            return False
+
+    return True
+
+
+class MemoryRepository(object):
     def __init__(self):
         self.__repo = defaultdict(dict)
 
@@ -16,8 +25,8 @@ class MemoryRepo(object):
         self.remove(self.find_by_id(_class, _id))
 
     def remove_by_filter(self, _class, _filter):
-        for entity in self.find(_class, _filter):
-            self.remove(entity.id)
+        for entity in self.find_by_filter(_class, _filter):
+            self.remove(entity)
 
     def contains(self, entity):
         return self.contains_by_id(entity.__class__, entity.id)
@@ -32,7 +41,11 @@ class MemoryRepo(object):
         return self.__repo[_class][_id]
 
     def find_by_filter(self, _class, _filter):
-        pass
+        return [entity for entity in self.__repo[_class].values()
+                if filter_match(_filter, entity)]
+
+    def list(self, _class):
+        return self.__repo[_class]
 
     def count(self, _class):
         return len(self.__repo[_class])

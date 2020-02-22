@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from ipodify_api.model.playlist import Playlist
 from ipodify_api.model.user import User
+from ipodify_api.model.playlist import Playlist
 
-from ipodify_api.repositories import MemoryRepo
+from ipodify_api.repositories import MemoryRepository, filter_match
 
 
-def test_memory_repo():
-    memory_repo = MemoryRepo()
+def test_filter_match():
+    assert filter_match({"name": "a"}, User("a"))
+    assert filter_match({"name": "a", "user": User("b")}, Playlist("a", User("b")))
 
-    playlist = Playlist("a")
-    memory_repo.add(playlist)
-    assert memory_repo.contains(playlist)
-    assert memory_repo.count(Playlist) == 1
-    assert playlist == memory_repo.find_by_id(Playlist, "a")
-    memory_repo.remove(playlist)
-    assert not memory_repo.contains(playlist)
-    assert not memory_repo.contains_by_id(Playlist, "a")
-    memory_repo.add(Playlist("b"))
-    assert memory_repo.count(Playlist) == 1
-    memory_repo.remove_by_id(Playlist, "b")
-    assert memory_repo.count(Playlist) == 0
+
+def test_memory_repository():
+    repository = MemoryRepository()
+
+    user = User("a")
+    repository.add(user)
+    assert repository.contains(user)
+    assert repository.count(User) == 1
+    assert user == repository.find_by_id(User, "a")
+    assert [user] == repository.find_by_filter(User, {"name": "a"})
+    repository.remove(user)
+    assert not repository.contains(user)
+    assert not repository.contains_by_id(User, "a")
+    repository.add(User("b"))
+    assert repository.count(User) == 1
+    repository.remove_by_id(User, "b")
+    assert repository.count(User) == 0

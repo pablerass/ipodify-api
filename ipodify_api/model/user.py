@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
+from . import Hasheable
+
+
 class RequestUser(object):
     def __init__(self, name, auth_header):
         self.__name = name
@@ -15,34 +18,22 @@ class RequestUser(object):
         return self.__auth_header
 
 
-class UserCollection(object):
-    def __init__(self):
-        self.__users = {}
-
-    def load_user(self, user_name):
-        if user_name not in self.__users:
-            self.__users[user_name] = User(user_name)
-        return self.__users[user_name]
-
-
-class User(object):
-    def __init__(self, name, playlists=None):
+class User(Hasheable):
+    def __init__(self, name):
         self.__name = name
-        if playlists is None:
-            self.__playlists = set()
-        else:
-            self.__playlists = playlists
 
     @property
     def name(self):
         return self.__name
 
+    def __dict__(self):
+        return {
+            'name': self.__name,
+        }
+
+    def __repr__(self):
+        return str(self.__dict__())
+
     @property
-    def playlists(self):
-        return self.__playlists
-
-    def add_playlist(self, playlist):
-        self.__playlists.add(playlist)
-
-    def remove_playlist(self, playlist):
-        self.__playlists.remove(playlist)
+    def id(self):
+        return self.__name

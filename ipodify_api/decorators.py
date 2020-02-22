@@ -11,7 +11,7 @@ from . import constants
 
 def auth(func):
     @wraps(func)
-    def wrapper():
+    def wrapper(*kargs, **kwargs):
         auth_header = {'Authorization': request.headers.get('Authorization')}
         me = f"{constants.SPOTIFY_API_URL}/v1/me"
         r = requests.get(me, headers=auth_header)
@@ -19,7 +19,7 @@ def auth(func):
             return {"message": "Not authenticated or invalid auth token"}, 401
         r.raise_for_status()
         user_data = r.json()
-        return func(RequestUser(user_data['id'], auth_header))
+        return func(RequestUser(user_data['id'], auth_header), *kargs, **kwargs)
     return wrapper
 
 

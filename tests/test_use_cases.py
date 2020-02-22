@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from ipodify_api.model.user import UserCollection
 from ipodify_api.model.playlist import Playlist
+from ipodify_api.model.user import User
 
-from ipodify_api.use_cases import AddPlaylistUseCase, GetPlaylistsUseCase, RemovePlaylistUseCase
+from ipodify_api.repositories import MemoryRepository
+
+from ipodify_api.use_cases import AddPlaylistUseCase, GetUserPlaylistsUseCase, RemovePlaylistUseCase
 
 
 @pytest.fixture
-def user_collection():
-    return UserCollection()
+def repository():
+    return MemoryRepository()
 
 
-def test_playlist_use_cases(user_collection):
-    add_playlist = AddPlaylistUseCase(user_collection)
-    get_playlists = GetPlaylistsUseCase(user_collection)
-    remove_playlist = RemovePlaylistUseCase(user_collection)
+def test_playlist_use_cases(repository):
+    add_playlist = AddPlaylistUseCase(repository)
+    get_playlists = GetUserPlaylistsUseCase(repository)
+    remove_playlist = RemovePlaylistUseCase(repository)
 
     user_name = "a"
-    playlist = Playlist("a")
-    add_playlist.execute(user_name, playlist)
-    assert get_playlists.execute(user_name) == set([playlist])
-    remove_playlist.execute(user_name, playlist)
-    assert get_playlists.execute(user_name) == set()
+    playlist_name = "a"
+
+    user = User(user_name)
+    playlist = Playlist(playlist_name, user)
+
+    add_playlist.execute(user_name, playlist_name)
+    assert get_playlists.execute(user_name) == [playlist]
+    remove_playlist.execute(user_name, playlist_name)
+    assert get_playlists.execute(user_name) == []

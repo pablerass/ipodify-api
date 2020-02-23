@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
-import requests
-
 from functools import wraps
+
 from flask import request
 
-from .model.user import RequestUser
 
-from . import constants
+from .ports import SpotifyNotAuthenticatedError
 
 
-def auth(func):
-    @wraps(func)
-    def wrapper(*kargs, **kwargs):
-        auth_header = {'Authorization': request.headers.get('Authorization')}
-        me = f"{constants.SPOTIFY_API_URL}/v1/me"
-        r = requests.get(me, headers=auth_header)
-        if r.status_code == 401:
-            return {"message": "Not authenticated or invalid auth token"}, 401
-        r.raise_for_status()
-        user_data = r.json()
-        return func(RequestUser(user_data['id'], auth_header), *kargs, **kwargs)
-    return wrapper
+# TODO: Move this with SporityPort in a non called ports file
+def spotify_auth(spotify_port):
+    def caller(func):
+        @wraps(func)
+        def wrapper(*kargs, **kwargs):
+            authorization = request.headers.get('Authorization')
+            try:
+                spotify_user = spotify_port.get_me(authorization)
+            except SpotifyNotAuthenticatedError:
+                return {"message": "Not authenticated or authorization"}, 401
+            return func(spotify_user, *kargs, **kwargs)
+        return wrapper
+    return caller
 
 
 def inject(*iargs, **ikwargs):

@@ -1,68 +1,100 @@
 # -*- coding: utf-8 -*-
+"""Ipodify application."""
 import logging
 
+from functools import partial
 from flask import Flask, abort, jsonify
 from json import JSONEncoder
 from werkzeug.exceptions import HTTPException
 
-from .decorators import auth, inject
-from .model import BaseModel
+from . import decorators
+from .decorators import inject
+from .ports import SpotifyPort
 from .model.playlist import Playlist
-from .use_cases import GetLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, RemovePlaylistUseCase
+from .use_cases import GetUserLibraryUseCase, GetUserPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
+                       RemovePlaylistUseCase
 from .repositories import MemoryRepository
 
 
 class CustomJSONEncoder(JSONEncoder):
+    """Ipodify application JSON Encoder."""
+
     def default(self, obj):
-        if isinstance(obj, BaseModel):
+        """Get default JSON Encode value."""
+        # TODO: Create JsonSerializable class to be used here
+        if hasattr(obj, '__dict__'):
             return obj.__dict__()
         return obj
+
 
 logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
 
+spotify_port = SpotifyPort()
 repository = MemoryRepository()
+auth = partial(decorators.spotify_auth(spotify_port))
+
+get_user_playlists_uc = GetUserPlaylistsUseCase(repository)
+get_user_library_uc = GetUserLibraryUseCase(spotify_port)
 add_playlist_uc = AddPlaylistUseCase(repository)
+get_playlist_uc = GetPlaylistUseCase(repository)
 remove_playlist_uc = RemovePlaylistUseCase(repository)
-get_playlists_uc = GetPlaylistsUseCase(repository)
-get_library_uc = GetLibraryUseCase()
 
 
 @app.errorhandler(HTTPException)
 def page_not_found(e):
+    """404 error."""
     return jsonify(error=e.code, text=e.name), e.code
 
 
 @app.route('/library', methods=['GET'])
 @auth
-@inject(get_library_uc)
-def get_library(user, get_library_use_case):
-    return get_library_use_case.execute(user)
+@inject(get_user_library_uc)
+def get_library(spotify_user, get_user_library_use_case):
+    """Get library endpoint."""
+    songs = get_user_library_use_case.execute(spotify_user)
+    return {"songs": songs}
 
 
 @app.route('/playlists', methods=['GET'])
 @auth
-@inject(get_playlists_uc)
-def get_playlists(user, get_playlist_use_case):
-    playlists = get_playlist_use_case.execute(user.name)
+@inject(get_user_playlists_uc)
+def get_user_playlists(spotify_user, get_user_playlist_use_case):
+    """Get playlists endpoint."""
+    playlists = get_user_playlist_use_case.execute(spotify_user.name)
     return {
         'playlists': playlists
     }
 
 
-@app.route('/playlists', methods=['POST'])
+@app.route('/playlists/<name>', methods=['PUT'])
 @auth
 @inject(add_playlist_uc)
-def add_playlists(user, add_playlist_use_case):
-    add_playlist_use_case.execute(user.name, Playlist("aaaa"))
-    return ""
+def add_playlist(spotify_user, add_playlist_use_case, name):
+    """Add playlist endpoint."""
+    playlist =  add_playlist_use_case.execute(spotify_user.name, name)
+    # TODO: Move this to a jsonable class
+    return playlist.__dict__()
+
+
+@app.route('/playlists/<name>', methods=['GET'])
+@auth
+@inject(get_playlist_uc)
+def get_playlist(spotify_user, get_playlist_use_case, name):
+    """Add playlist endpoint."""
+    playlist = get_playlist_use_case.execute(spotify_user.name, name)
+    if not playlist:
+        abort(404)
+    # TODO: Move this to a jsonable class
+    return playlist.__dict__()
 
 
 @app.route('/playlists/<name>', methods=['DELETE'])
 @auth
 @inject(remove_playlist_uc)
-def remove_playlists(user, remove_playlist_use_case, name):
-    if not remove_playlist_use_case.execute(user.name, Playlist(name)):
+def remove_playlist(spotify_user, remove_playlist_use_case, name):
+    """Remove playlist endpoint."""
+    if not remove_playlist_use_case.execute(spotify_user.name, name):
         abort(404)
     return ""

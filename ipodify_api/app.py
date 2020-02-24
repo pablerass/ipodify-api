@@ -3,14 +3,14 @@
 import logging
 
 from functools import partial
-from flask import Flask, abort, jsonify
+from flask import Flask, abort, jsonify, request
 from json import JSONEncoder
+from jsonschema import validate
 from werkzeug.exceptions import HTTPException
 
 from . import decorators
 from .decorators import inject
 from .ports import SpotifyPort
-from .model.playlist import Playlist
 from .use_cases import GetUserLibraryUseCase, GetUserPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
                        RemovePlaylistUseCase
 from .repositories import MemoryRepository
@@ -68,12 +68,38 @@ def get_user_playlists(spotify_user, get_user_playlist_use_case):
     }
 
 
+@app.route('/playlists', methods=['POST'])
+@auth
+@inject(add_playlist_uc)
+def add_playlist(spotify_user, add_playlist_use_case):
+    """Add playlists endpoint."""
+    request_content = request.json
+    # TODO: Add json schema validation
+    if request_content is None:
+        abort(400)
+    elif 'name' not in request_content:
+        abort(422)
+    name = request_content['name']
+    playlist = add_playlist_use_case.execute(spotify_user.name, name)
+    # TODO: Move this to a jsonable class
+    return playlist.__dict__()
+
+
 @app.route('/playlists/<name>', methods=['PUT'])
 @auth
 @inject(add_playlist_uc)
-def add_playlist(spotify_user, add_playlist_use_case, name):
-    """Add playlist endpoint."""
-    playlist =  add_playlist_use_case.execute(spotify_user.name, name)
+def set_playlist(spotify_user, add_playlist_use_case, name):
+    """Set playlist endpoint."""
+    print(add_playlist_uc)
+    request_content = request.json
+    # TODO: Add json schema validation
+    if request_content is None:
+        abort(400)
+    # TODO: Add rename support
+    elif 'name' in request_content and request_content['name'] != name:
+        abort(422)
+    # TODO: Try and catch error if user playlist with that name already exist
+    playlist = add_playlist_use_case.execute(spotify_user.name, name)
     # TODO: Move this to a jsonable class
     return playlist.__dict__()
 

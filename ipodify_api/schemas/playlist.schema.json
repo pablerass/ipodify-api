@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "filter": {
+      "type": "object",
+      "properties": {
+        "$or": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/filter" }
+        },
+        "$and": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/filter" }
+        },
+        "year": {
+          "type": { "$ref": "#/definitions/expression" }
+        }
+      },
+      "minProperties": 1
+    },
+    "expression": {
+      "type": "object",
+      "properties": {
+        "$eq": {
+          "type": ["integer", "string"]
+        },
+        "$ne": {
+          "type": ["integer", "string"]
+        },
+        "$gt": {
+          "type": "integer"
+        },
+        "$lt": {
+          "type": "integer"
+        },
+        "$le": {
+          "type": "integer"
+        },
+        "$ge": {
+          "type": "integer"
+        },
+        "$match": {
+          "type": "string"
+        },
+        "$nmatch": {
+          "type": "string"
+        }
+      },
+      "minProperties": 1,
+      "maxProperties": 1
+    }
+  },
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "filter": {
+      "type": { "$ref": "#/definitions/filter" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

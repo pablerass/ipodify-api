@@ -27,6 +27,14 @@
         "$ne": {
           "type": ["integer", "string"]
         },
+        "$in": {
+          "type": "array",
+          "items": ["integer", "string"]
+        },
+        "$ni": {
+          "type": "array",
+          "items": ["integer", "string"]
+        },
         "$gt": {
           "type": "integer"
         },

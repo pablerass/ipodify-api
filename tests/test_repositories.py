@@ -4,7 +4,7 @@ import pytest
 from ipodify_api.model.user import User
 from ipodify_api.model.playlist import Playlist
 
-from ipodify_api.repositories import MemoryRepository, filter_match
+from ipodify_api.repositories.memory import MemoryRepository, filter_match
 
 
 def test_filter_match():

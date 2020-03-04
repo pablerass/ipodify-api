@@ -13,7 +13,7 @@ from .decorators import inject
 from .ports import SpotifyPort
 from .use_cases import GetUserLibraryUseCase, GetUserPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
                        RemovePlaylistUseCase
-from .repositories import MemoryRepository
+from .repositories.memory import MemoryRepository
 
 
 class CustomJSONEncoder(JSONEncoder):

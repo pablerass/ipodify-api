@@ -5,16 +5,17 @@ from ipodify_api.model.user import User
 from ipodify_api.model.playlist import Playlist
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
+from ipodify_api.repositories.sql import SQLRepository, UserMap
 
 
 def test_filter_match():
     assert filter_match({"name": "a"}, User("a"))
     assert filter_match({"name": "a", "user": User("b")}, Playlist("a", User("b")))
 
-
-def test_memory_repository():
-    repository = MemoryRepository()
-
+@pytest.mark.parametrize("repository", [MemoryRepository(), SQLRepository()])
+def test_repository(repository):
+    # TODO: Test update
+    # TODO: Test find and remove when item does not exist
     user = User("a")
     repository.add(user)
     assert repository.contains(user)

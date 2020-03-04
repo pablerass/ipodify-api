@@ -37,7 +37,3 @@ class Playlist(Hasheable):
     @property
     def id(self):
         return self.user.id + ':' + self.__name
-
-    @staticmethod
-    def get_id(name, user: User):
-        return Playlist(name, user).id

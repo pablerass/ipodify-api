@@ -10,21 +10,37 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class UserMap(Base):
-    __tablename__ = "users"
+class EntityMap():
+    @classmethod
+    def __get_entity_name(cls):
+        class_name = cls.__name__
+        if class_name.endswith('Map'):
+            return class_name[:-(len('Map'))]
 
-    name = Column(String, primary_key=True)
+    @classmethod
+    def get_entity(cls):
+        return globals()[cls.__get_entity_name()]
+
+    @staticmethod
+    def __get_map_name(_class):
+        return _class.__name__ + "Map"
+
+    @staticmethod
+    def get_map(_class):
+        return globals()[EntityMap.__get_map_name(_class)]
 
     def to_entity(self):
         d = {k: v for k, v in self.__dict__.items()
              if not k.startswith('_sa')}
-        return User(**dict(d))
+        return self.get_entity()(**dict(d))
 
 
-# TODO: Manage this map in a better way, self generate, maybe?
-CLASS_MAP = {
-    User: UserMap
-}
+class UserMap(Base, EntityMap):
+    __tablename__ = "users"
+
+    name = Column(String, primary_key=True)
+
+
 
 
 class SQLRepository(object):
@@ -45,28 +61,31 @@ class SQLRepository(object):
 
         return self.__session
 
+    def _query(self, _class):
+        return self.session.query(EntityMap.get_map(_class))
+
+    def _id_filter(self, _class, _id):
+        ids = _id.split(':')
+        columns = [c.name for c in EntityMap.get_map(_class).__table__.primary_key.columns.values()]
+        return {column: ids[i] for i, column in enumerate(columns)}
+
     def add(self, entity):
-        self.session.add(CLASS_MAP[entity.__class__](**entity.__dict__()))
+        self.session.add(EntityMap.get_map(entity.__class__)(**entity.__dict__()))
 
     def remove(self, entity):
         self.remove_by_id(entity.__class__, entity.id)
 
     def remove_by_id(self, _class, _id):
-        map_class = CLASS_MAP[_class]
-        id_column_name = map_class.__table__.primary_key.columns.values()[0].name
-        self.session.query(map_class).filter_by(**{id_column_name: _id}).delete()
+        self._query(_class).filter_by(**self._id_filter(_class, _id)).delete()
 
     def remove_by_filter(self, _class, _filter):
-        map_class = CLASS_MAP[_class]
-        self.session.query(map_class).filter_by(**_filter).delete()
+        self._query(_class).filter_by(**_filter).delete()
 
     def contains(self, entity):
         return self.contains_by_id(entity.__class__, entity.id)
 
     def contains_by_id(self, _class, _id):
-        map_class = CLASS_MAP[_class]
-        id_column_name = map_class.__table__.primary_key.columns.values()[0].name
-        count = self.session.query(map_class).filter_by(**{id_column_name: _id}).count()
+        count = self._query(_class).filter_by(**self._id_filter(_class, _id)).count()
         return count > 0
 
     # TODO: Implement update
@@ -74,22 +93,16 @@ class SQLRepository(object):
     #    self.add(entity)
 
     def find_by_id(self, _class, _id):
-        # TODO: Enjoy how this explode with multiple primar key columns
-        map_class = CLASS_MAP[_class]
-        id_column_name = map_class.__table__.primary_key.columns.values()[0].name
-        entity_map = self.session.query(map_class).filter_by(**{id_column_name: _id}).first()
+        entity_map = self._query(_class).filter_by(**self._id_filter(_class, _id)).first()
         return entity_map.to_entity()
 
     def find_by_filter(self, _class, _filter):
-        map_class = CLASS_MAP[_class]
-        entity_maps = self.session.query(map_class).filter_by(**_filter).all()
+        entity_maps = self._query(_class).filter_by(**_filter).all()
         return [m.to_entity() for m in entity_maps]
 
     def list(self, _class):
-        map_class = CLASS_MAP[_class]
-        entity_maps = self.session.query(map_class).all()
+        entity_maps = self._query(_class).all()
         return [m.to_entity() for m in entity_maps]
 
     def count(self, _class):
-        map_class = CLASS_MAP[_class]
-        return self.session.query(map_class).count()
+        return self._query(_class).count()

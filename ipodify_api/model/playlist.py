@@ -1,26 +1,32 @@
 # -*- coding: utf-8 -*-
-
-from typing import List
+import enum
 
 from . import Hasheable
 from .user import User
 
 
-class PlaylistFilter(Hasheable):
+class PlaylistFilter():
     pass
 
 
+class PlaylistVisibility(enum.Enum):
+    PRIVATE = "private"
+
+
 class Playlist(Hasheable):
-    def __init__(self, name: str, user: User, filters: List[PlaylistFilter] = None):
-        self.__user = user
+    def __init__(self, name: str, owner: User, visibility: PlaylistVisibility = PlaylistVisibility.PRIVATE,
+                 filter: PlaylistFilter = None):
         self.__name = name
-        if filters is None:
-            self.__filters = []
+        self.__owner = owner
+        self.__visibility = visibility
+        self.__filter = filter
 
     def __dict__(self):
         return {
             'name': self.__name,
-            'filters': self.__filters
+            'owner': self.__owner.__dict__(),
+            'visibility': self.__visibility.value,
+            'filter': self.__filter.__dict__()
         }
 
     def __repr__(self):
@@ -31,9 +37,25 @@ class Playlist(Hasheable):
         return self.__name
 
     @property
-    def user(self):
-        return self.__user
+    def owner(self):
+        return self.__owner
+
+    @property
+    def description(self):
+        return self.__description
+
+    @description.setter
+    def description(self, description):
+        self.__description = description
+
+    @property
+    def filter(self):
+        return self.__filter
+
+    @filter.setter
+    def filter(self, filter):
+        self.__filter = filter
 
     @property
     def id(self):
-        return self.user.id + ':' + self.__name
+        return self.__owner.id + ':' + self.__name

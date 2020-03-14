@@ -80,7 +80,7 @@ class GetUserPlaylistsUseCase(PersistenceUseCase):
         """Execute use case."""
         # TODO: Shoulf security be only implemented in use case level?
         user = self.get_user(user_name)
-        playlists = self.repository.find_by_filter(Playlist, {"user": user})
+        playlists = self.repository.find_by_filter(Playlist, {"owner": user})
 
         return playlists
 
@@ -102,7 +102,7 @@ class GetPlaylistUseCase(PersistenceUseCase):
     def execute(self, user_name, playlist_name):
         """Execute use case."""
         user = self.get_user(user_name)
-        playlists = self.repository.find_by_filter(Playlist, {"user": user, "name": playlist_name})
+        playlists = self.repository.find_by_filter(Playlist, {"owner": user, "name": playlist_name})
         if not playlists:
             return {}
         return playlists[0]
@@ -114,7 +114,7 @@ class RemovePlaylistUseCase(PersistenceUseCase):
     def execute(self, user_name, playlist_name):
         """Execute use case."""
         user = self.get_user(user_name)
-        playlists = self.repository.find_by_filter(Playlist, {"user": user, "name": playlist_name})
+        playlists = self.repository.find_by_filter(Playlist, {"owner": user, "name": playlist_name})
         if not playlists:
             return {}
         self.repository.remove(playlists[0])

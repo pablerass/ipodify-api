@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+from inspect import signature
 
 
 # TODO: Move filter branch to Filterable entity class?
@@ -15,11 +16,16 @@ class MemoryRepository(object):
     def __init__(self):
         self.__repo = defaultdict(dict)
 
-    def add(self, entity):
-        self.__repo[entity.__class__][entity.id] = entity
+    def add(self, *entities):
+        for entity in entities:
+            arguments = signature(entity.__init__).parameters.keys()
+            arguments_dict = {a: getattr(entity, a) for a in arguments}
+            cloned_entity = entity.__class__(**arguments_dict)
+            self.__repo[entity.__class__][entity.id] = cloned_entity
 
-    def remove(self, entity):
-        del self.__repo[entity.__class__][entity.id]
+    def remove(self, *entities):
+        for entity in entities:
+            del self.__repo[entity.__class__][entity.id]
 
     def remove_by_id(self, _class, _id):
         self.remove(self.find_by_id(_class, _id))
@@ -34,8 +40,8 @@ class MemoryRepository(object):
     def contains_by_id(self, _class, _id):
         return _id in self.__repo[_class]
 
-    def update(self, entity):
-        self.add(entity)
+    def update(self, *entities):
+        self.add(*entities)
 
     def find_by_id(self, _class, _id):
         return self.__repo[_class][_id]

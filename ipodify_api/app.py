@@ -47,6 +47,12 @@ def page_not_found(e):
     """404 error."""
     return jsonify(error=e.code, text=e.name), e.code
 
+@app.route('/me', methods=['GET'])
+@auth
+def get_me(spotify_user):
+    """Get library endpoint."""
+    return {"id": spotify_user.name}
+
 
 @app.route('/library', methods=['GET'])
 @auth

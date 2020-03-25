@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+"""This is crap for my autoenjoyment but does not seem to be really usefull in almost none real scenario."""
 
+
+# TODO: Automatically import all mapped entities
 from ..model.user import User
+from ..model.playlist import Playlist
 
-from sqlalchemy import create_engine, Column, String
+from sqlalchemy import create_engine, Column, String, ForeignKey
 from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -41,6 +45,12 @@ class UserMap(Base, EntityMap):
     name = Column(String, primary_key=True)
 
 
+class PlaylistMap(Base, EntityMap):
+    __tablename__ = "playlists"
+
+    name = Column(String, primary_key=True)
+    owner = Column(String, ForeignKey('users.name'), primary_key=True)
+    description = Column(String)
 
 
 class SQLRepository(object):
@@ -64,13 +74,16 @@ class SQLRepository(object):
     def _query(self, _class):
         return self.session.query(EntityMap.get_map(_class))
 
+    def _key_columns(self, _class):
+        return [c.name for c in EntityMap.get_map(_class).__table__.primary_key.columns.values()]
+
     def _id_filter(self, _class, _id):
         ids = _id.split(':')
-        columns = [c.name for c in EntityMap.get_map(_class).__table__.primary_key.columns.values()]
+        columns = self._key_columns(_class)
         return {column: ids[i] for i, column in enumerate(columns)}
 
     def add(self, entity):
-        self.session.add(EntityMap.get_map(entity.__class__)(**entity.__dict__()))
+        self.session.add(EntityMap.get_map(entity.__class__)(**entity.__dict__))
 
     def remove(self, entity):
         self.remove_by_id(entity.__class__, entity.id)
@@ -88,9 +101,12 @@ class SQLRepository(object):
         count = self._query(_class).filter_by(**self._id_filter(_class, _id)).count()
         return count > 0
 
-    # TODO: Implement update
-    #def update(self, entity):
-    #    self.add(entity)
+    def update(self, entity):
+        columns = self._key_columns(entity._class)
+        entity_filter = {c: entity.getattr(c) for c in columns}
+        entity_map = self.find_by_filter(**entity_filter).first()
+        entity_map
+        self.session.commit()
 
     def find_by_id(self, _class, _id):
         entity_map = self._query(_class).filter_by(**self._id_filter(_class, _id)).first()

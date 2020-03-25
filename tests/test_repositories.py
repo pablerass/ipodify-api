@@ -5,7 +5,7 @@ from ipodify_api.model.user import User
 from ipodify_api.model.playlist import Playlist
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
-from ipodify_api.repositories.sql import SQLRepository, EntityMap, UserMap
+from ipodify_api.repositories.sql import SQLRepository, EntityMap, UserMap, PlaylistMap
 
 
 def test_filter_match():
@@ -34,3 +34,23 @@ def test_repository_with_simple_entity(repository):
     assert repository.count(User) == 1
     repository.remove_by_id(User, "b")
     assert repository.count(User) == 0
+
+
+#@pytest.mark.parametrize("repository", [MemoryRepository(), SQLRepository()])
+@pytest.mark.parametrize("repository", [MemoryRepository()])
+#@pytest.mark.parametrize("repository", [SQLRepository()])
+def test_repository_with_composed_entity(repository):
+    user = User("a")
+    repository.add(user)
+    playlist = Playlist("b", User("a"), "Some description")
+    print(playlist)
+    repository.add(playlist)
+    playlist.description = "Other description"
+    same_playlist = repository.find_by_id(Playlist, "a:b")
+    print(same_playlist)
+    repository.update(playlist)
+    same_playlist = repository.find_by_id(Playlist, "a:b")
+    print(same_playlist)
+    #print(playlists_by_name)
+    assert False
+    #assert False

@@ -14,7 +14,7 @@ def spotify_auth(spotify_port):
         def wrapper(*kargs, **kwargs):
             authorization = request.headers.get('Authorization')
             try:
-                spotify_user = spotify_port.get_me(authorization)
+                spotify_user = spotify_port.get_user(authorization)
             except SpotifyNotAuthenticatedError:
                 return {"message": "Not authenticated or authorization"}, 401
             return func(spotify_user, *kargs, **kwargs)

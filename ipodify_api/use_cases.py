@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """ipodify api use cases."""
+from collections import defaultdict
 import logging
 
 from .model.playlist import Playlist
@@ -54,21 +55,36 @@ class GetUserLibraryUseCase(LoggingUseCase):
 
     def execute(self, spotify_user: SpotifyUser):
         """Execute use case."""
-        # Switch this to return songs
+        # TODO: Change this to return songs
         tracks = []
+        albums_dict = defaultdict(list)
+        artists_dict = defaultdict(list)
         for track in self.__spotify_port.get_library(spotify_user):
             album = track.get('album')
             artists = track.get('artists')
             filtered_track = {
-                'spotify_href': track.get('href'),
-                'spotify_uri': track.get('uri'),
+                'uri': track.get('uri'),
                 'name': track.get('name'),
                 'isrc': track.get('external_ids').get('isrc'),
                 'release_date': album.get('release_date'),
+                'genres': [],   # Try to convert genres to set
                 'album': album.get('name'),
+                'album_uri': album.get('uri'),
                 'artists': [a.get('name') for a in artists]
             }
             tracks.append(filtered_track)
+            albums_dict[album.get('id')].append(filtered_track)
+            for artist in artists:
+                artists_dict[artist.get('id')].append(filtered_track)
+
+        # TODO: Find a more accurate way to get genres
+        for album in self.__spotify_port.get_albums(spotify_user, list(albums_dict.keys())):
+            for track in albums_dict[album.get('id')]:
+                track['genres'].extend([g for g in album.get('genres') if g not in track['genres']])
+
+        for artist in self.__spotify_port.get_artists(spotify_user, list(artists_dict.keys())):
+            for track in artists_dict[artist.get('id')]:
+                track['genres'].extend([g for g in artist.get('genres') if g not in track['genres']])
 
         return tracks
 

@@ -24,6 +24,7 @@ class SongSource(object):
     def url(self):
         return self.__url
 
+    @property
     def __dict__(self):
         d = {
             'service': self.__service,

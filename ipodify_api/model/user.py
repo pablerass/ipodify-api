@@ -12,13 +12,14 @@ class User(Hasheable):
     def name(self):
         return self.__name
 
+    @property
     def __dict__(self):
         return {
             'name': self.__name,
         }
 
     def __repr__(self):
-        return str(self.__dict__())
+        return str(self.__dict__)
 
     @property
     def id(self):

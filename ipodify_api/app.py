@@ -23,7 +23,7 @@ class CustomJSONEncoder(JSONEncoder):
         """Get default JSON Encode value."""
         # TODO: Create JsonSerializable class to be used here
         if hasattr(obj, '__dict__'):
-            return obj.__dict__()
+            return obj.__dict__
         return obj
 
 
@@ -88,7 +88,7 @@ def add_playlist(spotify_user, add_playlist_use_case):
     name = request_content['name']
     playlist = add_playlist_use_case.execute(spotify_user.name, name)
     # TODO: Move this to a jsonable class
-    return playlist.__dict__()
+    return playlist.__dict__
 
 
 @app.route('/playlists/<name>', methods=['PUT'])
@@ -107,7 +107,7 @@ def set_playlist(spotify_user, add_playlist_use_case, name):
     # TODO: Try and catch error if user playlist with that name already exist
     playlist = add_playlist_use_case.execute(spotify_user.name, name)
     # TODO: Move this to a jsonable class
-    return playlist.__dict__()
+    return playlist.__dict__
 
 
 @app.route('/playlists/<name>', methods=['GET'])
@@ -119,7 +119,7 @@ def get_playlist(spotify_user, get_playlist_use_case, name):
     if not playlist:
         abort(404)
     # TODO: Move this to a jsonable class
-    return playlist.__dict__()
+    return playlist.__dict__
 
 
 @app.route('/playlists/<name>', methods=['DELETE'])

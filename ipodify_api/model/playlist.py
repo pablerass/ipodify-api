@@ -21,16 +21,17 @@ class Playlist(Hasheable):
         self.__visibility = visibility
         self.__filter = filter
 
+    @property
     def __dict__(self):
         return {
             'name': self.__name,
-            'owner': self.__owner.__dict__(),
-            'visibility': self.__visibility.value,
-            'filter': self.__filter.__dict__()
+            'owner': self.__owner.__dict__,
+            'visibility': self.__visibility,
+            #'filter': self.__filter.__dict__
         }
 
     def __repr__(self):
-        return str(self.__dict__())
+        return str(self.__dict__)
 
     @property
     def name(self):
@@ -41,12 +42,12 @@ class Playlist(Hasheable):
         return self.__owner
 
     @property
-    def description(self):
-        return self.__description
+    def visibility(self):
+        return self.__visibility
 
-    @description.setter
-    def description(self, description):
-        self.__description = description
+    @visibility.setter
+    def visibility(self, visibility):
+        self.__visibility = visibility
 
     @property
     def filter(self):

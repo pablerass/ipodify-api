@@ -66,7 +66,7 @@ class GetUserLibraryUseCase(LoggingUseCase):
                 'uri': track.get('uri'),
                 'name': track.get('name'),
                 'isrc': track.get('external_ids').get('isrc'),
-                'release_date': album.get('release_date'),
+                'release_year': album.get('release_date').split('-')[0],
                 'genres': [],   # Try to convert genres to set
                 'album': album.get('name'),
                 'album_uri': album.get('uri'),

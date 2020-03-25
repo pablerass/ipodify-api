@@ -53,6 +53,18 @@ class GetUserLibraryUseCase(LoggingUseCase):
         super().__init__()
         self.__spotify_port = spotify_port
 
+    @staticmethod
+    def __language_from_isrc(isrc):
+        # TODO: Find less dramatic way to obtain language
+        if isrc is None:
+            return 'Unknown'
+        code = isrc[0:1]
+        if code == 'ES':
+            return 'Spanish'
+        if code == 'FR':
+            return 'French'
+        return 'English'
+
     def execute(self, spotify_user: SpotifyUser):
         """Execute use case."""
         # TODO: Change this to return songs
@@ -68,6 +80,7 @@ class GetUserLibraryUseCase(LoggingUseCase):
                 'isrc': track.get('external_ids').get('isrc'),
                 'release_year': album.get('release_date').split('-')[0],
                 'genres': [],   # Try to convert genres to set
+                'language': self.__language_from_isrc(track.get('external_ids').get('isrc')),
                 'album': album.get('name'),
                 'album_uri': album.get('uri'),
                 'artists': [a.get('name') for a in artists]

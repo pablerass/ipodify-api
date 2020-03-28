@@ -71,18 +71,20 @@ class GetUserLibraryUseCase(LoggingUseCase):
         tracks = []
         albums_dict = defaultdict(list)
         artists_dict = defaultdict(list)
+        # TODO: Do not add local songs
         for track in self.__spotify_port.get_library(spotify_user):
             album = track.get('album')
             artists = track.get('artists')
+            # TODO: Add date added
             filtered_track = {
                 'uri': track.get('uri'),
+                'href': track.get('href'),
                 'name': track.get('name'),
                 'isrc': track.get('external_ids').get('isrc'),
                 'release_year': album.get('release_date').split('-')[0],
                 'genres': [],   # Try to convert genres to set
                 'language': self.__language_from_isrc(track.get('external_ids').get('isrc')),
                 'album': album.get('name'),
-                'album_uri': album.get('uri'),
                 'artists': [a.get('name') for a in artists]
             }
             tracks.append(filtered_track)

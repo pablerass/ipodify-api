@@ -1,0 +1,150 @@
+{
+  "artists": [
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/64rxQRJsLgZwHHyWKB8fiF"
+      },
+      "followers": {
+        "href": null,
+        "total": 193404
+      },
+      "genres": [
+        "bubblegum dance",
+        "eurodance",
+        "europop",
+        "italian pop",
+        "italo dance"
+      ],
+      "href": "https://api.spotify.com/v1/artists/64rxQRJsLgZwHHyWKB8fiF",
+      "id": "64rxQRJsLgZwHHyWKB8fiF",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/db47e25f7d553170c12dd396101754c7464113df",
+          "width": 640
+        },
+        {
+          "height": 320,
+          "url": "https://i.scdn.co/image/7ee36255358f909e6d0d7b1935182bc21da28a06",
+          "width": 320
+        },
+        {
+          "height": 160,
+          "url": "https://i.scdn.co/image/9662a93e7125995f79d60cb4a41358434379ae63",
+          "width": 160
+        }
+      ],
+      "name": "Eiffel 65",
+      "popularity": 64,
+      "type": "artist",
+      "uri": "spotify:artist:64rxQRJsLgZwHHyWKB8fiF"
+    },
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/5ENS85nZShljwNgg4wFD7D"
+      },
+      "followers": {
+        "href": null,
+        "total": 226244
+      },
+      "genres": [
+        "eurodance",
+        "italo dance"
+      ],
+      "href": "https://api.spotify.com/v1/artists/5ENS85nZShljwNgg4wFD7D",
+      "id": "5ENS85nZShljwNgg4wFD7D",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/2173d40f53499d48ede30df030d9ddf5557ae8fb",
+          "width": 640
+        },
+        {
+          "height": 320,
+          "url": "https://i.scdn.co/image/5e3ab4014eaa25d3252ebce0e31f46c7846ab5fc",
+          "width": 320
+        },
+        {
+          "height": 160,
+          "url": "https://i.scdn.co/image/7173dcf5af829c61b81ca4a831e858ed76d2fc65",
+          "width": 160
+        }
+      ],
+      "name": "Gabry Ponte",
+      "popularity": 72,
+      "type": "artist",
+      "uri": "spotify:artist:5ENS85nZShljwNgg4wFD7D"
+    },
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/5GiiOzSPyDaP5b4Bb7Moe2"
+      },
+      "followers": {
+        "href": null,
+        "total": 51175
+      },
+      "genres": [
+        "spanish classical"
+      ],
+      "href": "https://api.spotify.com/v1/artists/5GiiOzSPyDaP5b4Bb7Moe2",
+      "id": "5GiiOzSPyDaP5b4Bb7Moe2",
+      "images": [
+        {
+          "height": 533,
+          "url": "https://i.scdn.co/image/b22fff19a03004ebae502ba8888133c892be0ba5",
+          "width": 535
+        },
+        {
+          "height": 199,
+          "url": "https://i.scdn.co/image/f3ef2cd46f0f3d844999c9e57eb0184222426bca",
+          "width": 200
+        },
+        {
+          "height": 64,
+          "url": "https://i.scdn.co/image/a9223dd11d90f7a453e9520479cb07f05fecc5c6",
+          "width": 64
+        }
+      ],
+      "name": "El Consorcio",
+      "popularity": 37,
+      "type": "artist",
+      "uri": "spotify:artist:5GiiOzSPyDaP5b4Bb7Moe2"
+    },
+    {
+      "external_urls": {
+        "spotify": "https://open.spotify.com/artist/10tYA1kHmiT7kCfF6HX0Wj"
+      },
+      "followers": {
+        "href": null,
+        "total": 25191
+      },
+      "genres": [
+        "korean jazz",
+        "vocal jazz"
+      ],
+      "href": "https://api.spotify.com/v1/artists/10tYA1kHmiT7kCfF6HX0Wj",
+      "id": "10tYA1kHmiT7kCfF6HX0Wj",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/0a927e9b5b25756539fb460d4eabc2ffb1a23234",
+          "width": 640
+        },
+        {
+          "height": 320,
+          "url": "https://i.scdn.co/image/0cb73875da335952ed2fa94cd81829bd420ff70d",
+          "width": 320
+        },
+        {
+          "height": 160,
+          "url": "https://i.scdn.co/image/90fe6d1bbdc3195f666b00d82daaf4a82b82fd9b",
+          "width": 160
+        }
+      ],
+      "name": "Youn Sun Nah",
+      "popularity": 38,
+      "type": "artist",
+      "uri": "spotify:artist:10tYA1kHmiT7kCfF6HX0Wj"
+    }
+  ]
+}

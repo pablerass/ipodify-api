@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+"""Contains main used app decorators."""
 from functools import wraps
 
 from flask import request
-
 
 from .ports import SpotifyNotAuthenticatedError
 
 
 # TODO: Move this with SporityPort in a non called ports file
 def spotify_auth(spotify_port):
+    """Get requests SpotifyUser to be injected in the request handler."""
     def caller(func):
         @wraps(func)
         def wrapper(*kargs, **kwargs):
@@ -23,6 +24,7 @@ def spotify_auth(spotify_port):
 
 
 def inject(*iargs, **ikwargs):
+    """Inject required use cases to be used by request handler."""
     def caller(func):
         @wraps(func)
         def wrapper(*args, **kwargs):

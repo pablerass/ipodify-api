@@ -5,7 +5,6 @@ import logging
 from functools import partial
 from flask import Flask, abort, jsonify, request
 from json import JSONEncoder
-from jsonschema import validate
 from werkzeug.exceptions import HTTPException
 
 from . import decorators
@@ -46,6 +45,7 @@ remove_playlist_uc = RemovePlaylistUseCase(repository)
 def page_not_found(e):
     """404 error."""
     return jsonify(error=e.code, text=e.name), e.code
+
 
 @app.route('/me', methods=['GET'])
 @auth

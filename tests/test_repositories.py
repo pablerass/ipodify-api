@@ -52,5 +52,3 @@ def test_repository_with_composed_entity(repository):
     same_playlist = repository.find_by_id(Playlist, "a:b")
     print(same_playlist)
     #print(playlists_by_name)
-    assert False
-    #assert False

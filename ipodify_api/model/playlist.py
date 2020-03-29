@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import enum
 
-from . import Hasheable
+from . import Hasheable, JSONSerializable
+
+from .song import SongFilter
 from .user import User
-
-
-class PlaylistFilter():
-    pass
 
 
 class PlaylistVisibility(enum.Enum):
@@ -14,12 +12,11 @@ class PlaylistVisibility(enum.Enum):
 
 
 class Playlist(Hasheable):
-    def __init__(self, name: str, owner: User, visibility: PlaylistVisibility = PlaylistVisibility.PRIVATE,
-                 filter: PlaylistFilter = None):
+    def __init__(self, name: str, owner: User, visibility = PlaylistVisibility.PRIVATE, song_filter = None):
         self.__name = name
         self.__owner = owner
         self.__visibility = visibility
-        self.__filter = filter
+        self.__song_filter = song_filter
 
     @property
     def __dict__(self):
@@ -27,7 +24,7 @@ class Playlist(Hasheable):
             'name': self.__name,
             'owner': self.__owner.__dict__,
             'visibility': self.__visibility,
-            #'filter': self.__filter.__dict__
+            #'filter': self.__song_filter.__dict__
         }
 
     def __repr__(self):
@@ -50,12 +47,12 @@ class Playlist(Hasheable):
         self.__visibility = visibility
 
     @property
-    def filter(self):
-        return self.__filter
+    def song_filter(self):
+        return self.__song_filter
 
-    @filter.setter
-    def filter(self, filter):
-        self.__filter = filter
+    @song_filter.setter
+    def song_filter(self, song_filter):
+        self.__song_filter = song_filter
 
     @property
     def id(self):

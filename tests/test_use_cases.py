@@ -68,7 +68,7 @@ def test_get_user_library_user_case(spotify_user, requests_mock, content):
             "href": "https://api.spotify.com/v1/tracks/2yAVzRiEQooPEJ9SYx11L3",
             "name": "Blue (Da Ba Dee) - Gabry Ponte Ice Pop Radio",
             "isrc": "ITT019810102",
-            "release_year": "2011",
+            "release_year": 2011,
             "album": "Europop",
             "language": "English",
             "artists": ["Eiffel 65", "Gabry Ponte"],

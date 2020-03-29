@@ -83,7 +83,7 @@ class GetUserLibraryUseCase(LoggingUseCase):
                 'href': track.get('href'),
                 'name': track.get('name'),
                 'isrc': track.get('external_ids').get('isrc'),
-                'release_year': album.get('release_date').split('-')[0],
+                'release_year': int(album.get('release_date').split('-')[0]),
                 'genres': [],   # Try to convert genres to set
                 'language': self.__language_from_isrc(track.get('external_ids').get('isrc')),
                 'album': album.get('name'),

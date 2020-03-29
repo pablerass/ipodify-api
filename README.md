@@ -1,3 +1,3 @@
-# Ipodify API [![Build Status](https://travis-ci.org/pablerass/ipodify-api.svg?branch=master)](https://travis-ci.org/pablerass/ipodify-api) [![Coverage Status](https://coveralls.io/repos/github/pablerass/ipodify-api/badge.svg?branch=master)](https://coveralls.io/github/pablerass/ipodify-api?branch=master)
+# Ipodify API [![Build Status](https://travis-ci.org/pablerass/ipodify-api.svg?branch=master)](https://travis-ci.org/pablerass/ipodify-api) [![Coverage Status](https://coveralls.io/repos/github/pablerass/ipodify-api/badge.svg?branch=master)](https://coveralls.io/github/pablerass/ipodify-api?branch=master) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 A service to create Ipod like smart lists with user defined filters.

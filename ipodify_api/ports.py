@@ -33,7 +33,7 @@ class SpotifyPort(object):
         r.raise_for_status()
         return SpotifyUser(r.json()['id'], authorization)
 
-    def get_library(self, spotify_user):
+    def get_library_tracks(self, spotify_user):
         authorization_header = {'Authorization': spotify_user.authorization}
         limit = 50
         next_page_url = f"{self.__url}/v1/me/tracks?offset=0&limit={limit}"

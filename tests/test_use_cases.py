@@ -4,6 +4,7 @@ import pytest
 
 from ipodify_api.model.playlist import Playlist
 from ipodify_api.model.user import User
+from ipodify_api.model.song import SpotifySong
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
 
@@ -13,7 +14,7 @@ from ipodify_api.use_cases import AddPlaylistUseCase, GetUserPlaylistsUseCase, R
                                   GetUserLibraryUseCase
 
 
-# TODO: Replace dir by pytest-datadir or pytest-datafiles
+# TODO: Replace this by pytest-datadir or pytest-datafiles
 @pytest.fixture
 def content():
     def _get_content(file_name):
@@ -61,7 +62,7 @@ def test_get_user_library_user_case(spotify_user, requests_mock, content):
         f"{spotify_url}/v1/artists?ids=64rxQRJsLgZwHHyWKB8fiF,5ENS85nZShljwNgg4wFD7D,5GiiOzSPyDaP5b4Bb7Moe2,10tYA1kHmiT7kCfF6HX0Wj",
         text=content("get_library_artists.json"))
     get_user_library = GetUserLibraryUseCase(SpotifyPort(spotify_url))
-    assert (get_user_library.execute(spotify_user)[0] ==
+    assert (get_user_library.execute(spotify_user)[0].__dict__ ==
         {
             "uri": "spotify:track:2yAVzRiEQooPEJ9SYx11L3",
             "href": "https://api.spotify.com/v1/tracks/2yAVzRiEQooPEJ9SYx11L3",

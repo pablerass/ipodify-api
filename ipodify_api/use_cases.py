@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """ipodify api use cases."""
 from collections import defaultdict
+
 import logging
 
 from .model.playlist import Playlist
 from .model.user import User
+from .model.song import SpotifySong
 from .ports import SpotifyUser
 
 
@@ -72,7 +74,7 @@ class GetUserLibraryUseCase(LoggingUseCase):
         albums_dict = defaultdict(list)
         artists_dict = defaultdict(list)
         # TODO: Do not add local songs
-        for track in self.__spotify_port.get_library(spotify_user):
+        for track in self.__spotify_port.get_library_tracks(spotify_user):
             album = track.get('album')
             artists = track.get('artists')
             # TODO: Add date added
@@ -101,7 +103,8 @@ class GetUserLibraryUseCase(LoggingUseCase):
             for track in artists_dict[artist.get('id')]:
                 track['genres'].extend([g for g in artist.get('genres') if g not in track['genres']])
 
-        return tracks
+        # TODO: See if it is a good option to improve this
+        return [SpotifySong(**t) for t in tracks]
 
 
 class GetUserPlaylistsUseCase(PersistenceUseCase):

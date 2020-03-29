@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from abc import ABCMeta, abstractmethod
 
-class Hasheable(object):
+
+class Hasheable(metaclass=ABCMeta):
     @property
+    @abstractmethod
     def id(self):
-        raise NotImplemented
+        pass
 
     def __hash__(self):
         return hash(self.id)
@@ -12,3 +15,13 @@ class Hasheable(object):
         if isinstance(other, self.__class__):
             return self.id == other.id
         return NotImplemented
+
+
+class JSONSerializable(metaclass=ABCMeta):
+    @abstractmethod
+    def toJSON(self):
+        pass
+
+    @abstractmethod
+    def fromJSON(self):
+        pass

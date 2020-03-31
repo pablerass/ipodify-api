@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """User model objects package."""
-from . import Hasheable
+from . import Identifiable
 
 
-class User(Hasheable):
+class User(Identifiable):
     """User entity class."""
 
     def __init__(self, name):

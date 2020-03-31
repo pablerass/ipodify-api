@@ -3,6 +3,7 @@
 from collections import defaultdict
 from inspect import signature
 
+# TODO: Only allow to add Identifiable model
 
 # TODO: Move filter branch to Filterable entity class?
 def filter_match(_filter, entity):

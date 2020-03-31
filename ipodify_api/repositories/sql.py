@@ -12,6 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+# TODO: Only allow to add Identifiable model
 
 class EntityMap():
     """Base class to map entities classes to SQL alchemy classes."""

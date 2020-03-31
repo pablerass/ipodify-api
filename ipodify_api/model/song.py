@@ -2,8 +2,11 @@
 """Song model objects package."""
 from abc import ABCMeta, abstractmethod
 
+import json
 import operator as ops
 import re
+
+from . import Hasheable, JSONSerializable
 
 
 class InvalidOperatorException(Exception):
@@ -12,12 +15,68 @@ class InvalidOperatorException(Exception):
     pass
 
 
-class SongFilter(metaclass=ABCMeta):
+class InvalidFilterException(Exception):
+    """Exception raise when filter object does not work properly with an invalid operator."""
+
+    pass
+
+
+class InvalidJsonSongFilterException(Exception):
+    """Exception raise when a json string is not a valid song filter representation."""
+
+    pass
+
+
+class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
     """Abstract song filter class."""
+
+    @staticmethod
+    @abstractmethod
+    def _managed_operators():
+        pass
 
     @abstractmethod
     def match(self, song):
         """Return if the song matches against the filter."""
+        pass
+
+    def toJSON(self):
+        """Convert to json string."""
+        return json.dumps(self.__dict__)
+
+    @staticmethod
+    def _decompose_filter(filter_dict):
+        if len(filter_dict) != 1:
+            raise InvalidJsonSongFilterException(f"{filter_dict} has more than one key")
+        operator = list(filter_dict)[0]
+        value = filter_dict[operator]
+        return operator, value
+
+    @classmethod
+    def fromJSON(cls, json_string):
+        """Create object from json string."""
+        return cls._fromDict(json.loads(json_string))
+
+    @classmethod
+    def _fromDict(cls, filter_dict):
+        return cls._fromComponents(*cls._decompose_filter(filter_dict))
+
+    @classmethod
+    @abstractmethod
+    def _fromComponents(cls, operator, value):
+        for _class in cls.__subclasses__():
+            if operator in _class._managed_operators():
+                return _class._fromComponents(operator, value)
+        raise InvalidJsonSongFilterException()
+
+    def __hash__(self):
+        """Return hash."""
+        return hash(self.toJSON())
+
+    @property
+    @abstractmethod
+    def __dict__(self):
+        """Return dict representation of the object."""
         pass
 
 
@@ -28,32 +87,40 @@ class SongFilter(metaclass=ABCMeta):
 class SongPropertyFilter(SongFilter):
     """Song filter that matches a song property to a value with an operator."""
 
+    @staticmethod
+    def _managed_operators():
+        return ["$eq", "$ne", "$gt", "$lt", "$le", "$ge", "$match", "$nmatch", "$in", "$ni"]
+
     def __init__(self, operator, song_property, value):
         """Create song property filter."""
-        if operator in ["eq", "ne", "gt", "lt", "le", "ge"]:
-            self.__method = getattr(ops, operator)
-            if operator == "ne":
+        if operator not in self._managed_operators():
+            raise InvalidOperatorException(f"{operator} is not a valid single song filter operator")
+
+        if operator in ["$eq", "$ne", "$gt", "$lt", "$le", "$ge"]:
+            self.__method = getattr(ops, operator.lstrip('$'))
+            if operator == "$ne":
                 self.__list_method = all
             else:
                 self.__list_method = any
-        elif operator == "match":
+        elif operator == "$match":
             # TODO: Raise exception if value is not a valid regex
             self.__method = lambda sp, regex: bool(re.match(regex, sp))
             self.__list_method = any
-        elif operator == "nmatch":
+        elif operator == "$nmatch":
             # TODO: Raise exception if value is not a valid regex
             self.__method = lambda sp, regex: not bool(re.match(regex, sp))
             self.__list_method = all
-        elif operator == "in":
+        elif operator == "$in":
             # TODO: Raise exception if value is not a list
             self.__method = lambda sp, value_list: sp in value_list
             self.__list_method = any
-        elif operator == "ni":
+        elif operator == "$ni":
             # TODO: Raise exception if value is not a list
             self.__method = lambda sp, value_list: sp not in value_list
             self.__list_method = all
         else:
-            raise InvalidOperatorException(f"{operator} is not a valid single song filter operator")
+            raise InvalidFilterException(f"{operator} is a valid operator but it is not properly handled")
+
         self.__operator = operator
         self.__song_property = song_property
         self.__value = value
@@ -68,18 +135,34 @@ class SongPropertyFilter(SongFilter):
         else:
             return self.__list_method([self.__method(v, self.__value) for v in property_value])
 
+    @classmethod
+    def _fromComponents(cls, operator, value):
+        return cls(operator, *cls._decompose_filter(value))
+
+    @property
+    def __dict__(self):
+        """Return dict representation of the object."""
+        return {self.__operator: {self.__song_property: self.__value}}
+
 
 class SongAggregateFilter(SongFilter):
     """Song filter that aggregates multiple song filters with an operator."""
 
+    @staticmethod
+    def _managed_operators():
+        return ["$and", "$or"]
+
     def __init__(self, operator, song_filters):
         """Create song filter that aggregates other filters."""
-        if operator == "and":
+        if operator not in self._managed_operators():
+            raise InvalidOperatorException(f"{operator} is not a valid aggregate song filter operator")
+
+        if operator == "$and":
             self.__method = all
-        elif operator == "or":
+        elif operator == "$or":
             self.__method = any
         else:
-            raise InvalidOperatorException(f"{operator} is not a valid aggregate song filter operator")
+            raise InvalidFilterException(f"{operator} is a valid operator but it is not properly handled")
         self.__operator = operator
         self.__song_filters = song_filters
 
@@ -87,9 +170,22 @@ class SongAggregateFilter(SongFilter):
         """Return if the song matches against the filter."""
         return self.__method([f.match(song) for f in self.__song_filters])
 
+    @classmethod
+    def _fromComponents(cls, operator, value):
+        return cls(operator, [SongFilter._fromDict(d) for d in value])
+
+    @property
+    def __dict__(self):
+        """Return dict representation of the object."""
+        return {self.__operator: [f.__dict__ for f in self.__song_filters]}
+
 
 class SongNotFilter(SongFilter):
     """Song filter that negates other song filter."""
+
+    @staticmethod
+    def _managed_operators():
+        return ["$not"]
 
     def __init__(self, song_filter):
         """Create song filter negation filter."""
@@ -98,6 +194,15 @@ class SongNotFilter(SongFilter):
     def match(self, song):
         """Return if the song matches against the filter."""
         return not self.__song_filter.match(song)
+
+    @classmethod
+    def _fromComponents(cls, operator, value):
+        return cls(SongFilter._fromDict(value))
+
+    @property
+    def __dict__(self):
+        """Return dict representation of the object."""
+        return {"$not": self.__song_filter.__dict__}
 
 
 class Song(object):

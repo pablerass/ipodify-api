@@ -6,8 +6,22 @@ from abc import ABCMeta, abstractmethod
 class Hasheable(metaclass=ABCMeta):
     """Hasheable abstract class definition."""
 
-    @property
     @abstractmethod
+    def __hash__(self):
+        """Return hash."""
+        pass
+
+    def __eq__(self, other):
+        """Return equal function."""
+        if isinstance(other, self.__class__):
+            return self.__hash__() == other.__hash__()
+        return NotImplemented
+
+
+class Identifiable(Hasheable, metaclass=ABCMeta):
+    """Identifiable abstract class definition."""
+
+    @property
     def id(self):
         """Return id to generate its hash."""
         pass
@@ -15,12 +29,6 @@ class Hasheable(metaclass=ABCMeta):
     def __hash__(self):
         """Return hash."""
         return hash(self.id)
-
-    def __eq__(self, other):
-        """Reqturn equal function."""
-        if isinstance(other, self.__class__):
-            return self.id == other.id
-        return NotImplemented
 
 
 class JSONSerializable(metaclass=ABCMeta):
@@ -31,7 +39,8 @@ class JSONSerializable(metaclass=ABCMeta):
         """Convert to json string."""
         pass
 
+    @staticmethod
     @abstractmethod
-    def fromJSON(self):
+    def fromJSON(json_string):
         """Create object from json string."""
         pass

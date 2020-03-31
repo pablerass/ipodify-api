@@ -2,7 +2,7 @@
 """Playlist model objects package."""
 import enum
 
-from . import Hasheable
+from . import Identifiable
 
 
 class PlaylistVisibility(enum.Enum):
@@ -11,7 +11,7 @@ class PlaylistVisibility(enum.Enum):
     PRIVATE = "private"
 
 
-class Playlist(Hasheable):
+class Playlist(Identifiable):
     """Playlist entity class."""
 
     def __init__(self, name, owner, visibility=PlaylistVisibility.PRIVATE, song_filter=None):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """This is crap for my autoenjoyment but does not seem to be really usefull in almost none real scenario."""
+# TODO: Only allow to add Identifiable model
 
 # TODO: Automatically import all mapped entities
 from ..model.user import User               # noqa: F401
@@ -12,7 +13,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-# TODO: Only allow to add Identifiable model
 
 class EntityMap():
     """Base class to map entities classes to SQL alchemy classes."""

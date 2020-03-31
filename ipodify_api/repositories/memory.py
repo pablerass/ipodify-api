@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Simple in memory model entities repository."""
+# TODO: Only allow to add Identifiable model
 from collections import defaultdict
 from inspect import signature
 
-# TODO: Only allow to add Identifiable model
 
 # TODO: Move filter branch to Filterable entity class?
 def filter_match(_filter, entity):

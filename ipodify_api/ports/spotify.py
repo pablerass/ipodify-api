@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """Ports required by ipodify api service."""
+from flask import request
+from functools import wraps
+
 import requests
 
 
@@ -26,6 +29,21 @@ class SpotifyUser(object):
     def authorization(self):
         """Get user authorization header."""
         return self.__authorization
+
+
+def spotify_auth(spotify_port):
+    """Get requests SpotifyUser to be injected in the request handler."""
+    def caller(func):
+        @wraps(func)
+        def wrapper(*kargs, **kwargs):
+            authorization = request.headers.get('Authorization')
+            try:
+                spotify_user = spotify_port.get_user(authorization)
+            except SpotifyNotAuthenticatedError:
+                return {"message": "Not authenticated or authorization"}, 401
+            return func(spotify_user, *kargs, **kwargs)
+        return wrapper
+    return caller
 
 
 class SpotifyPort(object):

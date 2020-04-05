@@ -8,10 +8,10 @@ from ipodify_api.model.song import SpotifySong
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
 
-from ipodify_api.ports import SpotifyPort, SpotifyUser
+from ipodify_api.ports.spotify import SpotifyPort, SpotifyUser
 
-from ipodify_api.use_cases import AddPlaylistUseCase, GetUserPlaylistsUseCase, RemovePlaylistUseCase, \
-                                  GetUserLibraryUseCase
+from ipodify_api.use_cases import GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, RemovePlaylistUseCase, \
+                                  GetUserTrackLibraryUseCase
 
 
 # TODO: Replace this by pytest-datadir or pytest-datafiles
@@ -37,7 +37,7 @@ def spotify_user():
 
 def test_playlist_use_cases(repository):
     add_playlist = AddPlaylistUseCase(repository)
-    get_playlists = GetUserPlaylistsUseCase(repository)
+    get_playlists = GetPlaylistsUseCase(repository)
     remove_playlist = RemovePlaylistUseCase(repository)
 
     user_name = "a"
@@ -61,7 +61,7 @@ def test_get_user_library_user_case(spotify_user, requests_mock, content):
     requests_mock.get(
         f"{spotify_url}/v1/artists?ids=64rxQRJsLgZwHHyWKB8fiF,5ENS85nZShljwNgg4wFD7D,5GiiOzSPyDaP5b4Bb7Moe2,10tYA1kHmiT7kCfF6HX0Wj",
         text=content("get_library_artists.json"))
-    get_user_library = GetUserLibraryUseCase(SpotifyPort(spotify_url))
+    get_user_library = GetUserTrackLibraryUseCase(SpotifyPort(spotify_url))
     assert (get_user_library.execute(spotify_user)[0].__dict__ ==
         {
             "uri": "spotify:track:2yAVzRiEQooPEJ9SYx11L3",

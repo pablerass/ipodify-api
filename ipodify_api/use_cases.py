@@ -7,7 +7,7 @@ import logging
 from .model.playlist import Playlist
 from .model.user import User
 from .model.song import SpotifySong
-from .ports import SpotifyUser
+from .ports.spotify import SpotifyUser
 
 
 class LoggingUseCase(object):
@@ -47,7 +47,7 @@ class PersistenceUseCase(LoggingUseCase):
         return user
 
 
-class GetUserLibraryUseCase(LoggingUseCase):
+class GetUserTrackLibraryUseCase(LoggingUseCase):
     """Get user library use case."""
 
     def __init__(self, spotify_port):
@@ -107,8 +107,8 @@ class GetUserLibraryUseCase(LoggingUseCase):
         return [SpotifySong(**t) for t in tracks]
 
 
-class GetUserPlaylistsUseCase(PersistenceUseCase):
-    """Get user playlists use case."""
+class GetPlaylistsUseCase(PersistenceUseCase):
+    """Get playlists use case."""
 
     def execute(self, user_name):
         """Execute use case."""

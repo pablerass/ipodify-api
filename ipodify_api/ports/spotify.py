@@ -3,6 +3,8 @@
 from flask import request
 from functools import wraps
 
+from ..model import Hasheable
+
 import requests
 
 
@@ -12,7 +14,8 @@ class SpotifyNotAuthenticatedError(Exception):
     pass
 
 
-class SpotifyUser(object):
+# TUNE: Maybe this object should be moved to model
+class SpotifyUser(Hasheable):
     """Spotify user."""
 
     def __init__(self, name, authorization):
@@ -30,13 +33,17 @@ class SpotifyUser(object):
         """Get user authorization header."""
         return self.__authorization
 
+    def __hash__(self):
+        """Return hash."""
+        return hash(self.__name)
+
 
 def spotify_auth(spotify_port):
     """Get requests SpotifyUser to be injected in the request handler."""
     def caller(func):
         @wraps(func)
         def wrapper(*kargs, **kwargs):
-            authorization = request.headers.get('Authorization')
+            authorization = request.headers.get('Authorization', '')
             try:
                 spotify_user = spotify_port.get_user(authorization)
             except SpotifyNotAuthenticatedError:
@@ -52,6 +59,11 @@ class SpotifyPort(object):
     def __init__(self, url="https://api.spotify.com"):
         """Create a Spotify port with specific url."""
         self.__url = url
+
+    @property
+    def url(self):
+        """Return Spotify url used."""
+        return self.__url
 
     def get_user(self, authorization):
         """Get SpotifyUser."""

@@ -12,61 +12,47 @@
           "type": "array",
           "items": { "$ref": "#/definitions/filter" }
         },
-        "year": {
-          "type": { "$ref": "#/definitions/expression" }
-        }
+        "$not": { "$ref": "#/definitions/filter" },
+        "$eq": { "$ref": "#/definitions/property_value" },
+        "$ne": { "$ref": "#/definitions/property_value" },
+        "$in": { "$ref": "#/definitions/property_array" },
+        "$ni": { "$ref": "#/definitions/property_array" },
+        "$gt": { "$ref": "#/definitions/property_value" },
+        "$lt": { "$ref": "#/definitions/property_value" },
+        "$le": { "$ref": "#/definitions/property_value" },
+        "$ge": { "$ref": "#/definitions/property_value" },
+        "$match": { "$ref": "#/definitions/property_value" },
+        "$nmatch": { "$ref": "#/definitions/property_value" }
       },
+      "maxProperties": 1,
       "minProperties": 1
     },
-    "expression": {
+    "property_value": {
       "type": "object",
-      "properties": {
-        "$eq": {
-          "type": ["integer", "string"]
-        },
-        "$ne": {
-          "type": ["integer", "string"]
-        },
-        "$in": {
-          "type": "array",
-          "items": ["integer", "string"]
-        },
-        "$ni": {
-          "type": "array",
-          "items": ["integer", "string"]
-        },
-        "$gt": {
-          "type": "integer"
-        },
-        "$lt": {
-          "type": "integer"
-        },
-        "$le": {
-          "type": "integer"
-        },
-        "$ge": {
-          "type": "integer"
-        },
-        "$match": {
-          "type": "string"
-        },
-        "$nmatch": {
-          "type": "string"
-        }
-      },
+      "maxProperties": 1,
       "minProperties": 1,
-      "maxProperties": 1
-    }
-  },
-  "type": "object",
-  "properties": {
-    "name": {
-      "type": "string"
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "string" },
+          { "type": "number" }
+        ]
+      }
     },
-    "filter": {
-      "type": { "$ref": "#/definitions/filter" }
+    "property_array": {
+      "type": "object",
+      "maxProperties": 1,
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "array",
+            "items": { "type": "string" }
+          },
+          { "type": "array",
+            "items": { "type": "number" }
+          }
+        ]
       }
     }
   },
-  "additionalProperties": false
+  "$ref": "#/definitions/filter"
 }

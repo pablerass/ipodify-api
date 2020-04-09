@@ -15,7 +15,7 @@ class MockSpotifyPort(object):
         return SpotifyUser("hombredeincognito", token_urlsafe(32))
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def client():
     def config(binder):
         binder.bind(SpotifyPort, MockSpotifyPort())
@@ -23,6 +23,11 @@ def client():
     app = create_app(config)
     with app.test_client() as client:
        yield client
+
+
+def test_not_found(client):
+    response = client.get('/not_found')
+    assert json.loads(response.data)['error'] == 404
 
 
 def test_me(client):

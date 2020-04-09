@@ -6,7 +6,7 @@ from secrets import token_urlsafe
 from ipodify_api.ports.spotify import SpotifyPort, SpotifyUser
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def spotify_port():
     return SpotifyPort("http://mockspotify")
 

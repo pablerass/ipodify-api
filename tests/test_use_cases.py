@@ -15,7 +15,7 @@ from ipodify_api.use_cases import GetPlaylistsUseCase, AddPlaylistUseCase, GetPl
 
 
 # TODO: Replace this by pytest-datadir or pytest-datafiles
-@pytest.fixture
+@pytest.fixture(scope="session")
 def content():
     def _get_content(file_name):
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'use_cases', file_name)
@@ -25,12 +25,12 @@ def content():
     return _get_content
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def repository():
     return MemoryRepository()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def spotify_user():
     return SpotifyUser("user", "aaaaa")
 

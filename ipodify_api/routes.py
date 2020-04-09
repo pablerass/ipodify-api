@@ -3,9 +3,7 @@
 import inject
 
 from functools import partial
-from flask import Blueprint, abort, jsonify, request
-
-from werkzeug.exceptions import HTTPException
+from flask import Blueprint, abort, request
 
 from .ports.spotify import SpotifyPort, spotify_auth
 from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
@@ -14,12 +12,6 @@ from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlayl
 
 main = Blueprint('main', __name__)
 auth = partial(spotify_auth(inject.instance(SpotifyPort)))
-
-
-@main.errorhandler(HTTPException)
-def http_exception(e):
-    """Return json exception."""
-    return jsonify(error=e.code, text=e.name), e.code
 
 
 @main.route('/me', methods=['GET'])

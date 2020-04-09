@@ -2,9 +2,9 @@
 """Ipodify application."""
 import inject
 
-from flask import Flask
-
 from json import JSONEncoder
+from flask import Flask, jsonify
+from werkzeug.exceptions import HTTPException
 
 from .ports.spotify import SpotifyPort
 from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
@@ -36,6 +36,11 @@ def app_config(binder):
     binder.bind(RemovePlaylistUseCase, RemovePlaylistUseCase(repository))
 
 
+def handle_http_exception(e):
+    """Return json output of exception."""
+    return jsonify(error=e.code, text=e.name), e.code
+
+
 def create_app(inject_config=app_config):
     """Create app."""
     app = Flask(__name__)
@@ -46,5 +51,6 @@ def create_app(inject_config=app_config):
         from . import routes
 
         app.register_blueprint(routes.main)
+        app.register_error_handler(HTTPException, handle_http_exception)
 
         return app

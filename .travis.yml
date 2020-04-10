@@ -1,11 +1,18 @@
----
 sudo: false
-language: python
+addons:
+  sonarcloud:
+    organization: "pablerass"
+    token:
+      secure: "Yn6Nbyy18Sd6ep2FUfJGBJ3hnEYvE04OT+fjANIVn3PYmndCHWZqR876snikQWm7UzRCG7KHdiOv0/Ed1kITjbXH3GIjf5poYjTTyJFrZbRVe4b6+L3o4DfzVrIS/200IbyL2MlBgAsxWlQ2YgKJHoCrlYHGsGLI3VlhSh0rqQ1DzyJbr4nHG3TK30em4HS0t7E8ZCCDRSRpx/IIooULsUqoMlRDTNBFTehjqU14zyo6lkLIktbDjzvKDwsXE3Cl3NbjU5Gy9CxBeMdEojlY6480JBPQuRQKdefOWf3if0YXBwkp69ZjM4c9gW7jg7zUskfXkeX455hIpkUvSJaabw/LIvTFlIbSXmWyvR8mMzm8ERFGZTHDH2yU2ybT8nBrEHmqdiydhwIxCxsXnJtiCgsKIH3U6Lob+PP3V3fb+562UBDtIRivQ414NzfDcb9IFG6OtIgnKh0fs2TfKMapvwYMPR9a4pSWmzCukicTXHBcZMFxMBI0tMxG6yOxfa6t6F6h2WKVw7Q31ZCX3mQoMKk/gbR/1ZniUXsR/f+EF5fBfgjG9vIAUhYTziB16ZrdyPkXI80J62VVvOdBUG8neNXeV1B2hYep1LQ2d847ZXvGXHJMrlgL6XPpg10RjBXrEcDmJ9vrgMLfelkwXHbVO5m/Yj6r4hYp3+EWAR4JG0E="
+language: "python"
 python:
-  - "3.8"
+- "3.8"
 install:
-  - pip install tox-travis
-  - pip install coveralls
-script: tox
+- "pip install -rrequirements_test.txt"
+script:
+- "flake8"
+- "sonar-scanner"
+- "coverage run -m pytest"
+- "coverage report -m"
 after_success:
-  - coveralls
+- "coveralls"

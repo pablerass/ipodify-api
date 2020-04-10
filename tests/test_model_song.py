@@ -4,7 +4,6 @@ import pytest
 import json
 
 from ipodify_api.model.song import Song, SongFilter, SongAggregateFilter, SongPropertyFilter, SongNotFilter
-from ipodify_api.schemas import validate_schema_data
 
 
 def test_property_filters():
@@ -96,7 +95,6 @@ def test_song_filter_json():
                  SongNotFilter(SongPropertyFilter("$lt", "release_year", 2010))]))
     composed_filter_dict = {"$not": {"$and": [{"$ge": {"release_year": 2000}},
                                               {"$not": {"$lt": {"release_year": 2010}}}]}}
-    validate_schema_data(composed_filter.__dict__, "filter")
     assert composed_filter.__dict__ == composed_filter_dict
     assert composed_filter.toJSON() == json.dumps(composed_filter_dict)
     assert SongFilter.fromJSON(json.dumps(composed_filter_dict)) == composed_filter

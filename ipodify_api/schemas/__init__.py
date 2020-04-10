@@ -3,9 +3,11 @@
 import json
 import os
 
-from flask import request
+from flask import abort, jsonify, make_response, request, Response
 from functools import wraps
-from jsonschema import validate
+from jsonschema import validate, ValidationError
+
+from ..error import abort_with_message, _jsonify_error
 
 
 def _get_schema_file_name(schema_name):
@@ -16,15 +18,19 @@ def _get_schema_file_name(schema_name):
 def validate_schema_data(data, schema_name):
     """Validate data against an schema."""
     with open(_get_schema_file_name(schema_name), 'r') as f:
-         return validate(data, json.load(f))
+        validate(data, json.load(f))
 
 
-def payload_schema(schema_name):
+def body_schema(schema_name):
     """Validate payload schema."""
     def caller(func):
         @wraps(func)
         def wrapper(*kargs, **kwargs):
-            validate_schema_data(request.json, schema_name)
-            return func(*kargs, **kwargs)
+            try:
+                validate_schema_data(request.json, schema_name)
+                return func(*kargs, **kwargs)
+            except ValidationError as e:
+                # TODO: Improve response message
+                return abort_with_message(e.message, 400)
         return wrapper
     return caller

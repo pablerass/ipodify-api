@@ -55,10 +55,10 @@ class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
     @classmethod
     def fromJSON(cls, json_string):
         """Create object from json string."""
-        return cls._fromDict(json.loads(json_string))
+        return cls.fromDict(json.loads(json_string))
 
     @classmethod
-    def _fromDict(cls, filter_dict):
+    def fromDict(cls, filter_dict):
         return cls._fromComponents(*cls._decompose_filter(filter_dict))
 
     @classmethod
@@ -172,7 +172,7 @@ class SongAggregateFilter(SongFilter):
 
     @classmethod
     def _fromComponents(cls, operator, value):
-        return cls(operator, [SongFilter._fromDict(d) for d in value])
+        return cls(operator, [SongFilter.fromDict(d) for d in value])
 
     @property
     def __dict__(self):
@@ -197,7 +197,7 @@ class SongNotFilter(SongFilter):
 
     @classmethod
     def _fromComponents(cls, operator, value):
-        return cls(SongFilter._fromDict(value))
+        return cls(SongFilter.fromDict(value))
 
     @property
     def __dict__(self):

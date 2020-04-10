@@ -33,3 +33,17 @@ def test_not_found(client):
 def test_me(client):
     response = client.get('/me')
     assert json.loads(response.data) == {'id': 'hombredeincognito'}
+
+def test_post_playlist(client):
+    playlist_dict = {
+        "name": "a",
+        "filter": {
+            "$and": [
+                {"$eq": {"album": "Veneno"}},
+                {"$equ": {"release_year": 2010}}
+            ]
+        }
+    }
+    response = client.post('/playlists', json=playlist_dict)
+    print(response.get_data())
+    assert False

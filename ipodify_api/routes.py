@@ -1,27 +1,28 @@
 # -*- coding: utf-8 -*-
-"""Ipodify main routes."""
+"""Ipodify api routes."""
 import inject
 
 from functools import partial
 from flask import Blueprint, abort, request
 
 from .ports.spotify import SpotifyPort, spotify_auth
+from .schemas import body_schema
 from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
                        RemovePlaylistUseCase
 
 
-main = Blueprint('main', __name__)
+api = Blueprint('api', __name__)
 auth = partial(spotify_auth(inject.instance(SpotifyPort)))
 
 
-@main.route('/me', methods=['GET'])
+@api.route('/me', methods=['GET'])
 @auth
 def get_me(spotify_user):
     """Get library endpoint."""
     return {"id": spotify_user.name}
 
 
-@main.route('/library', methods=['GET'])
+@api.route('/library', methods=['GET'])
 @auth
 @inject.params(get_user_track_library_use_case=GetUserTrackLibraryUseCase)
 def get_library(spotify_user, get_user_track_library_use_case):
@@ -30,7 +31,7 @@ def get_library(spotify_user, get_user_track_library_use_case):
     return {"songs": songs}
 
 
-@main.route('/playlists', methods=['GET'])
+@api.route('/playlists', methods=['GET'])
 @auth
 @inject.params(get_playlists_use_case=GetPlaylistsUseCase)
 def get_playlists(spotify_user, get_playlists_use_case):
@@ -41,24 +42,21 @@ def get_playlists(spotify_user, get_playlists_use_case):
     }
 
 
-@main.route('/playlists', methods=['POST'])
+@api.route('/playlists', methods=['POST'])
+@body_schema("playlist")
 @auth
 @inject.params(add_playlist_use_case=AddPlaylistUseCase)
 def add_playlist(spotify_user, add_playlist_use_case):
     """Add playlists endpoint."""
     request_content = request.json
     # TODO: Add json schema validation
-    if request_content is None:
-        abort(400)
-    elif 'name' not in request_content:
-        abort(422)
-    name = request_content['name']
-    playlist = add_playlist_use_case.execute(spotify_user.name, name)
+    playlist = add_playlist_use_case.execute(request_content['name'], spotify_user.name, request_content['filter'])
     # TODO: Move this to a jsonable class
     return playlist.__dict__
 
 
-@main.route('/playlists/<name>', methods=['PUT'])
+@api.route('/playlists/<name>', methods=['PUT'])
+@body_schema("playlist")
 @auth
 @inject.params(add_playlist_use_case=AddPlaylistUseCase)
 def set_playlist(spotify_user, add_playlist_use_case, name):
@@ -76,7 +74,7 @@ def set_playlist(spotify_user, add_playlist_use_case, name):
     return playlist.__dict__
 
 
-@main.route('/playlists/<name>', methods=['GET'])
+@api.route('/playlists/<name>', methods=['GET'])
 @auth
 @inject.params(get_playlist_use_case=GetPlaylistUseCase)
 def get_playlist(spotify_user, get_playlist_use_case, name):
@@ -88,7 +86,7 @@ def get_playlist(spotify_user, get_playlist_use_case, name):
     return playlist.__dict__
 
 
-@main.route('/playlists/<name>', methods=['DELETE'])
+@api.route('/playlists/<name>', methods=['DELETE'])
 @auth
 @inject.params(remove_playlist_use_case=RemovePlaylistUseCase)
 def remove_playlist(spotify_user, remove_playlist_use_case, name):

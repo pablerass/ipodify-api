@@ -3,13 +3,14 @@
 import inject
 
 from json import JSONEncoder
-from flask import Flask, jsonify
+from flask import Flask
 from werkzeug.exceptions import HTTPException
 
+from .error import handle_http_exception
 from .ports.spotify import SpotifyPort
+from .repositories.memory import MemoryRepository
 from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
                        RemovePlaylistUseCase
-from .repositories.memory import MemoryRepository
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -36,11 +37,6 @@ def app_config(binder):
     binder.bind(RemovePlaylistUseCase, RemovePlaylistUseCase(repository))
 
 
-def handle_http_exception(e):
-    """Return json output of exception."""
-    return jsonify(error=e.code, text=e.name), e.code
-
-
 def create_app(inject_config=app_config):
     """Create app."""
     app = Flask(__name__)
@@ -50,7 +46,7 @@ def create_app(inject_config=app_config):
     with app.app_context():
         from . import routes
 
-        app.register_blueprint(routes.main)
         app.register_error_handler(HTTPException, handle_http_exception)
+        app.register_blueprint(routes.api)
 
         return app

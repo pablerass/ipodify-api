@@ -14,7 +14,7 @@ class PlaylistVisibility(enum.Enum):
 class Playlist(Identifiable):
     """Playlist entity class."""
 
-    def __init__(self, name, owner, visibility=PlaylistVisibility.PRIVATE, song_filter=None):
+    def __init__(self, name, owner, song_filter, visibility=PlaylistVisibility.PRIVATE):
         """Create playlist entity."""
         self.__name = name
         self.__owner = owner
@@ -61,9 +61,9 @@ class Playlist(Identifiable):
         """Get dict representation of the playlist."""
         return {
             'name': self.__name,
-            'owner': self.__owner.__dict__,
-            'visibility': self.__visibility,
-            # 'filter': self.__song_filter.__dict__
+            'owner': self.__owner.name,
+            'visibility': self.__visibility.value,
+            'filter': self.__song_filter.__dict__
         }
 
     def __repr__(self):

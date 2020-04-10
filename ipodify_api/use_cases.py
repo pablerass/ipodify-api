@@ -6,7 +6,7 @@ import logging
 
 from .model.playlist import Playlist
 from .model.user import User
-from .model.song import SpotifySong
+from .model.song import SongFilter, SpotifySong
 from .ports.spotify import SpotifyUser
 
 
@@ -122,10 +122,11 @@ class GetPlaylistsUseCase(PersistenceUseCase):
 class AddPlaylistUseCase(PersistenceUseCase):
     """Add playlist use case."""
 
-    def execute(self, user_name, playlist_name):
+    def execute(self, playlist_name, user_name, song_filter_dict):
         """Execute use case."""
         user = self.get_user(user_name)
-        playlist = Playlist(playlist_name, user)
+        song_filter = SongFilter.fromDict(song_filter_dict)
+        playlist = Playlist(playlist_name, user, song_filter)
         self.repository.add(playlist)
         return playlist
 

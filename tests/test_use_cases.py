@@ -4,7 +4,7 @@ import pytest
 
 from ipodify_api.model.playlist import Playlist
 from ipodify_api.model.user import User
-from ipodify_api.model.song import SpotifySong
+from ipodify_api.model.song import SongFilter, SpotifySong
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
 
@@ -44,9 +44,10 @@ def test_playlist_use_cases(repository):
     playlist_name = "a"
 
     user = User(user_name)
-    playlist = Playlist(playlist_name, user)
+    filter_dict = {"$eq": {"album": "Veneno"}}
+    playlist = Playlist(playlist_name, user, SongFilter.fromDict(filter_dict))
 
-    add_playlist.execute(user_name, playlist_name)
+    add_playlist.execute(playlist_name, user_name, filter_dict)
     assert get_playlists.execute(user_name) == [playlist]
     remove_playlist.execute(user_name, playlist_name)
     assert get_playlists.execute(user_name) == []

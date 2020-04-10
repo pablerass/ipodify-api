@@ -59,6 +59,7 @@ class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
 
     @classmethod
     def fromDict(cls, filter_dict):
+        """Create object from dict."""
         return cls._fromComponents(*cls._decompose_filter(filter_dict))
 
     @classmethod

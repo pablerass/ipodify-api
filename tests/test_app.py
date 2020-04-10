@@ -35,7 +35,7 @@ def test_me(client):
     assert json.loads(response.data) == {'id': 'hombredeincognito'}
 
 def test_post_playlist(client):
-    playlist_dict = {
+    playlist_invalid_dict = {
         "name": "a",
         "filter": {
             "$and": [
@@ -44,6 +44,5 @@ def test_post_playlist(client):
             ]
         }
     }
-    response = client.post('/playlists', json=playlist_dict)
-    print(response.get_data())
-    assert False
+    response = client.post('/playlists', json=playlist_invalid_dict)
+    assert json.loads(response.data)['error'] == 400

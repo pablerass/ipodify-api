@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """Ipodify error management application."""
+# TUNE: All this module looks like crap and its is
 from flask import abort, jsonify, make_response
 
 
 def handle_http_exception(e):
     """Return json output of exception."""
-    return _jsonify_error(e.code, e.name)
+    return _jsonify_error(message=e.name, status_code=e.code)
 
 
 def abort_with_message(message, status_code):

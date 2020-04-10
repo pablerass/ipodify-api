@@ -3,11 +3,11 @@
 import json
 import os
 
-from flask import abort, jsonify, make_response, request, Response
+from flask import request
 from functools import wraps
 from jsonschema import validate, ValidationError
 
-from ..error import abort_with_message, _jsonify_error
+from ..error import abort_with_message
 
 
 def _get_schema_file_name(schema_name):

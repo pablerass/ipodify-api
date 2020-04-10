@@ -12,6 +12,7 @@ install:
 script:
 - "flake8"
 - "sonar-scanner"
+# TODO: Exit from coveralls and use only sonarcloud
 - "coverage run -m pytest"
 - "coverage report -m"
 after_success:

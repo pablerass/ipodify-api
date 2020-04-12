@@ -5,20 +5,28 @@ import os
 
 from flask import request
 from functools import wraps
-from jsonschema import validate, ValidationError
+from jsonschema import validate, ValidationError, RefResolver
 
 from ..error import abort_with_message
 
 
+SCHEMA_FILES_PATH = os.path.dirname(os.path.abspath(__file__))
+
+
 def _get_schema_file_name(schema_name):
     """Get schema file name."""
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), f"{schema_name}.schema.json")
+    return os.path.join(SCHEMA_FILES_PATH, f"{schema_name}.schema.json")
 
 
 def validate_schema_data(data, schema_name):
     """Validate data against an schema."""
     with open(_get_schema_file_name(schema_name), 'r') as f:
-        validate(data, json.load(f))
+        schema = json.load(f)
+        resolver = RefResolver(
+            base_uri=f"file://{SCHEMA_FILES_PATH}/",
+            referrer=schema
+        )
+        validate(data, schema, resolver=resolver)
 
 
 def body_schema(schema_name):

@@ -49,7 +49,6 @@ def get_playlists(spotify_user, get_playlists_use_case):
 def add_playlist(spotify_user, add_playlist_use_case):
     """Add playlists endpoint."""
     request_content = request.json
-    # TODO: Add json schema validation
     playlist = add_playlist_use_case.execute(request_content['name'], spotify_user.name, request_content['filter'])
     # TODO: Move this to a jsonable class
     return playlist.__dict__
@@ -62,7 +61,6 @@ def add_playlist(spotify_user, add_playlist_use_case):
 def set_playlist(spotify_user, add_playlist_use_case, name):
     """Set playlist endpoint."""
     request_content = request.json
-    # TODO: Add json schema validation
     if request_content is None:
         abort(400)
     # TODO: Add rename support

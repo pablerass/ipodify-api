@@ -1,92 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "definitions": {
-    "filter": {
-      "type": "object",
-      "properties": {
-        "$or": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/filter"
-          }
-        },
-        "$and": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/filter"
-          }
-        },
-        "$not": {
-          "$ref": "#/definitions/filter"
-        },
-        "$eq": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$ne": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$in": {
-          "$ref": "#/definitions/property_array"
-        },
-        "$ni": {
-          "$ref": "#/definitions/property_array"
-        },
-        "$gt": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$lt": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$le": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$ge": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$match": {
-          "$ref": "#/definitions/property_value"
-        },
-        "$nmatch": {
-          "$ref": "#/definitions/property_value"
-        }
-      },
-      "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": false
-    },
-    "property_value": {
-      "type": "object",
-      "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": {
-        "oneOf": [
-          { "type": "string" },
-          { "type": "number" }
-        ]
-      }
-    },
-    "property_array": {
-      "type": "object",
-      "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          {
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          }
-        ]
-      }
-    }
-  },
   "type": "object",
   "properties": {
     "name": {
@@ -95,9 +8,14 @@
     "owner": {
       "type": "string"
     },
+    "visibility": {
+      "type": "string",
+      "enum": ["private"],
+      "default": "private"
+    },
     "filter": {
-      "$ref": "#/definitions/filter"
+      "$ref": "filter.schema.json"
     }
   },
-  "requiredProperties": ["name", "filter"]
+  "requiredProperties": ["name", "owner", "filter"]
 }

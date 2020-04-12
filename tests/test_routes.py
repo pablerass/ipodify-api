@@ -2,12 +2,13 @@
 import pytest
 
 import inject
-import json
 
 from secrets import token_urlsafe
 
 from ipodify_api.app import create_app
 from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.repositories.memory import MemoryRepository
+from ipodify_api.use_cases import AddPlaylistUseCase
 
 
 class MockSpotifyPort(object):
@@ -18,7 +19,10 @@ class MockSpotifyPort(object):
 @pytest.fixture(scope="session")
 def client():
     def config(binder):
-        binder.bind(SpotifyPort, MockSpotifyPort())
+        spotify_port = MockSpotifyPort()
+        repository = MemoryRepository()
+        binder.bind(SpotifyPort, spotify_port)
+        binder.bind(AddPlaylistUseCase, AddPlaylistUseCase(repository))
 
     app = create_app(config)
     with app.test_client() as client:
@@ -27,12 +31,13 @@ def client():
 
 def test_not_found(client):
     response = client.get('/not_found')
-    assert json.loads(response.data)['error'] == 404
+    assert response.json['error'] == 404
 
 
 def test_me(client):
     response = client.get('/me')
-    assert json.loads(response.data) == {'id': 'hombredeincognito'}
+    assert response.json == {'id': 'hombredeincognito'}
+
 
 def test_post_playlist(client):
     playlist_invalid_dict = {
@@ -45,4 +50,21 @@ def test_post_playlist(client):
         }
     }
     response = client.post('/playlists', json=playlist_invalid_dict)
-    assert json.loads(response.data)['error'] == 400
+    assert response.json['error'] == 400
+
+    playlist_dict = {
+        "name": "a",
+        "filter": {
+            "$and": [
+                {"$eq": {"album": "Veneno"}},
+                {"$eq": {"release_year": 2010}}
+            ]
+        }
+    }
+    playlist_response_dict = dict(playlist_dict)
+    playlist_response_dict.update({
+        "visibility": "private",
+        "owner": "hombredeincognito"
+    })
+    response = client.post('/playlists', json=playlist_dict)
+    assert response.json == playlist_response_dict

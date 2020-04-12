@@ -5,7 +5,7 @@ import inject
 from functools import partial
 from flask import Blueprint, abort, request
 
-from .ports.spotify import SpotifyPort, spotify_auth
+from .gateways.spotify import SpotifyPort, spotify_auth
 from .schemas import body_schema
 from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
                        RemovePlaylistUseCase

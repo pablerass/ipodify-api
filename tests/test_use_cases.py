@@ -8,7 +8,7 @@ from ipodify_api.model.song import SongFilter, SpotifySong
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
 
-from ipodify_api.ports.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
 
 from ipodify_api.use_cases import GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, RemovePlaylistUseCase, \
                                   GetUserTrackLibraryUseCase

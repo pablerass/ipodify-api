@@ -7,7 +7,7 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 from .error import handle_http_exception
-from .ports.spotify import SpotifyPort
+from .gateways.spotify import SpotifyPort
 from .repositories.memory import MemoryRepository
 from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
                        RemovePlaylistUseCase

@@ -2,28 +2,12 @@
 """ipodify api use cases."""
 from collections import defaultdict
 
-import logging
-
 from .model.playlist import Playlist
 from .model.user import User
 from .model.song import SongFilter, SpotifySong
-from .ports.spotify import SpotifyUser
 
 
-class LoggingUseCase(object):
-    """Base use case class that supports logging."""
-
-    def __init__(self):
-        """Create logging use case."""
-        self.__logger = logging.getLogger(f"use_cases.{self.__class__.__name__}")
-
-    @property
-    def logger(self):
-        """Get logger."""
-        return self.__logger
-
-
-class PersistenceUseCase(LoggingUseCase):
+class PersistenceUseCase(object):
     """Base use case that supports persisted entities."""
 
     def __init__(self, repository):
@@ -47,7 +31,7 @@ class PersistenceUseCase(LoggingUseCase):
         return user
 
 
-class GetUserTrackLibraryUseCase(LoggingUseCase):
+class GetUserTrackLibraryUseCase(object):
     """Get user library use case."""
 
     def __init__(self, spotify_port):
@@ -67,9 +51,8 @@ class GetUserTrackLibraryUseCase(LoggingUseCase):
             return 'French'
         return 'English'
 
-    def execute(self, spotify_user: SpotifyUser):
+    def execute(self, spotify_user):
         """Execute use case."""
-        # TODO: Change this to return songs
         tracks = []
         albums_dict = defaultdict(list)
         artists_dict = defaultdict(list)

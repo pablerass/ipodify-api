@@ -7,7 +7,7 @@ import json
 from secrets import token_urlsafe
 
 from ipodify_api.app import create_app
-from ipodify_api.ports.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
 
 
 class MockSpotifyPort(object):

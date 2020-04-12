@@ -3,7 +3,7 @@ import pytest
 
 from secrets import token_urlsafe
 
-from ipodify_api.ports.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
 
 
 @pytest.fixture(scope="session")

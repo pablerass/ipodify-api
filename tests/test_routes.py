@@ -6,7 +6,7 @@ import inject
 from secrets import token_urlsafe
 
 from ipodify_api.app import create_app
-from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.gateways.spotify import SpotifyGateway, SpotifyUser
 from ipodify_api.repositories.memory import MemoryRepository
 from ipodify_api.use_cases import AddPlaylistUseCase
 
@@ -19,9 +19,9 @@ class MockSpotifyPort(object):
 @pytest.fixture(scope="session")
 def client():
     def config(binder):
-        spotify_port = MockSpotifyPort()
+        spotify_gateway = MockSpotifyPort()
         repository = MemoryRepository()
-        binder.bind(SpotifyPort, spotify_port)
+        binder.bind(SpotifyGateway, spotify_gateway)
         binder.bind(AddPlaylistUseCase, AddPlaylistUseCase(repository))
 
     app = create_app(config)

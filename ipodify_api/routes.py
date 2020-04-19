@@ -5,14 +5,14 @@ import inject
 from functools import partial
 from flask import Blueprint, abort, request
 
-from .gateways.spotify import SpotifyPort, spotify_auth
+from .gateways.spotify import SpotifyGateway, spotify_auth
 from .schemas import body_schema
 from .use_cases import GetFilterPreviewUseCase, GetLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, \
                        GetPlaylistUseCase, RemovePlaylistUseCase
 
 
 api = Blueprint('api', __name__)
-auth = partial(spotify_auth(inject.instance(SpotifyPort)))
+auth = partial(spotify_auth(inject.instance(SpotifyGateway)))
 
 
 @api.route('/me', methods=['GET'])

@@ -8,7 +8,7 @@ from ipodify_api.model.track import TrackFilter, SpotifyTrack
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
 
-from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.gateways.spotify import SpotifyGateway, SpotifyUser
 
 from ipodify_api.use_cases import GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, RemovePlaylistUseCase, \
                                   GetFilterPreviewUseCase, GetLibraryUseCase
@@ -63,7 +63,7 @@ def test_get_library_use_case(spotify_user, requests_mock, content):
     requests_mock.get(
         f"{spotify_url}/v1/artists?ids=64rxQRJsLgZwHHyWKB8fiF,5ENS85nZShljwNgg4wFD7D,5GiiOzSPyDaP5b4Bb7Moe2,10tYA1kHmiT7kCfF6HX0Wj",
         text=content("get_library_artists.json"))
-    get_user_library = GetLibraryUseCase(SpotifyPort(spotify_url))
+    get_user_library = GetLibraryUseCase(SpotifyGateway(spotify_url))
     # TODO: Test the full list
     assert (get_user_library.execute(spotify_user)[0].__dict__ ==
         {
@@ -90,7 +90,7 @@ def test_get_preview_filter_use_case(spotify_user, requests_mock, content):
     requests_mock.get(
         f"{spotify_url}/v1/artists?ids=64rxQRJsLgZwHHyWKB8fiF,5ENS85nZShljwNgg4wFD7D,5GiiOzSPyDaP5b4Bb7Moe2,10tYA1kHmiT7kCfF6HX0Wj",
         text=content("get_library_artists.json"))
-    get_user_library = GetLibraryUseCase(SpotifyPort(spotify_url))
+    get_user_library = GetLibraryUseCase(SpotifyGateway(spotify_url))
     get_filter_preview = GetFilterPreviewUseCase(get_user_library)
     assert (get_filter_preview.execute(spotify_user, {"$eq": {"album": "Europop"}})[0].__dict__ ==
         {

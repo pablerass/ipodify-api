@@ -38,14 +38,14 @@ class SpotifyUser(Hasheable):
         return hash(self.__name)
 
 
-def spotify_auth(spotify_port):
+def spotify_auth(spotify_gateway):
     """Get requests SpotifyUser to be injected in the request handler."""
     def caller(func):
         @wraps(func)
         def wrapper(*kargs, **kwargs):
             authorization = request.headers.get('Authorization', '')
             try:
-                spotify_user = spotify_port.get_user(authorization)
+                spotify_user = spotify_gateway.get_user(authorization)
             except SpotifyNotAuthenticatedError:
                 return {"message": "Not authenticated or authorization"}, 401
             return func(spotify_user, *kargs, **kwargs)
@@ -53,7 +53,7 @@ def spotify_auth(spotify_port):
     return caller
 
 
-class SpotifyPort(object):
+class SpotifyGateway(object):
     """Port to interact with Spotify service."""
 
     def __init__(self, url="https://api.spotify.com"):

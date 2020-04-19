@@ -7,7 +7,7 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 from .error import handle_http_exception
-from .gateways.spotify import SpotifyPort
+from .gateways.spotify import SpotifyGateway
 from .repositories.memory import MemoryRepository
 from .use_cases import GetFilterPreviewUseCase, GetLibraryUseCase, GetPlaylistsUseCase, \
                        AddPlaylistUseCase, GetPlaylistUseCase, RemovePlaylistUseCase
@@ -26,13 +26,13 @@ class CustomJSONEncoder(JSONEncoder):
 
 def app_config(binder):
     """Configure app inject bindings."""
-    spotify_port = SpotifyPort()
+    spotify_gateway = SpotifyGateway()
     repository = MemoryRepository()
-    get_library_use_case = GetLibraryUseCase(spotify_port)
+    get_library_use_case = GetLibraryUseCase(spotify_gateway)
 
-    binder.bind(SpotifyPort, spotify_port)
+    binder.bind(SpotifyGateway, spotify_gateway)
     binder.bind(GetLibraryUseCase, get_library_use_case)
-    binder.bind(GetFilterPreviewUseCase, GetFilterPreviewUseCase(spotify_port))
+    binder.bind(GetFilterPreviewUseCase, GetFilterPreviewUseCase(spotify_gateway))
     binder.bind(GetPlaylistsUseCase, GetPlaylistsUseCase(repository))
     binder.bind(GetPlaylistUseCase, GetPlaylistUseCase(repository))
     binder.bind(AddPlaylistUseCase, AddPlaylistUseCase(repository))

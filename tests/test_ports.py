@@ -3,15 +3,15 @@ import pytest
 
 from secrets import token_urlsafe
 
-from ipodify_api.gateways.spotify import SpotifyPort, SpotifyUser
+from ipodify_api.gateways.spotify import SpotifyGateway, SpotifyUser
 
 
 @pytest.fixture(scope="session")
-def spotify_port():
-    return SpotifyPort("http://mockspotify")
+def spotify_gateway():
+    return SpotifyGateway("http://mockspotify")
 
 
-def test_get_user(spotify_port, requests_mock):
+def test_get_user(spotify_gateway, requests_mock):
     me = {
         "display_name": "hombredeincognito",
         "external_urls": {
@@ -27,6 +27,6 @@ def test_get_user(spotify_port, requests_mock):
         "type": "user",
         "uri": "spotify:user:hombredeincognito"
     }
-    requests_mock.get(f"{spotify_port.url}/v1/me", json=me)
+    requests_mock.get(f"{spotify_gateway.url}/v1/me", json=me)
     auth_token = token_urlsafe(32)
-    assert spotify_port.get_user(auth_token) == SpotifyUser("hombredeincognito", auth_token)
+    assert spotify_gateway.get_user(auth_token) == SpotifyUser("hombredeincognito", auth_token)

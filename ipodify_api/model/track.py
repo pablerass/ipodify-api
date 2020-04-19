@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Song model objects package."""
+"""Track model objects package."""
 from abc import ABCMeta, abstractmethod
 
 import json
@@ -21,14 +21,15 @@ class InvalidFilterException(Exception):
     pass
 
 
-class InvalidJsonSongFilterException(Exception):
-    """Exception raise when a json string is not a valid song filter representation."""
+class InvalidJsonTrackFilterException(Exception):
+    """Exception raise when a json string is not a valid track filter representation."""
 
     pass
 
 
-class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
-    """Abstract song filter class."""
+# TODO: Track filter could be generalized as property filter
+class TrackFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
+    """Abstract track filter class."""
 
     @staticmethod
     @abstractmethod
@@ -36,8 +37,8 @@ class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def match(self, song):
-        """Return if the song matches against the filter."""
+    def match(self, track):
+        """Return if the track matches against the filter."""
         pass
 
     def toJSON(self):
@@ -47,7 +48,7 @@ class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
     @staticmethod
     def _decompose_filter(filter_dict):
         if len(filter_dict) != 1:
-            raise InvalidJsonSongFilterException(f"{filter_dict} has more than one key")
+            raise InvalidJsonTrackFilterException(f"{filter_dict} has more than one key")
         operator = list(filter_dict)[0]
         value = filter_dict[operator]
         return operator, value
@@ -68,7 +69,7 @@ class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
         for _class in cls.__subclasses__():
             if operator in _class._managed_operators():
                 return _class._fromComponents(operator, value)
-        raise InvalidJsonSongFilterException()
+        raise InvalidJsonTrackFilterException()
 
     def __hash__(self):
         """Return hash."""
@@ -82,20 +83,20 @@ class SongFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
 
 
 # TODO: Add class to composite playlists
-# class SongInsidePlaylistFilter(SongFiler):
+# class TrackInsidePlaylistFilter(TrackFiler):
 
 
-class SongPropertyFilter(SongFilter):
-    """Song filter that matches a song property to a value with an operator."""
+class TrackPropertyFilter(TrackFilter):
+    """Track filter that matches a track property to a value with an operator."""
 
     @staticmethod
     def _managed_operators():
         return ["$eq", "$ne", "$gt", "$lt", "$le", "$ge", "$match", "$nmatch", "$in", "$ni"]
 
-    def __init__(self, operator, song_property, value):
-        """Create song property filter."""
+    def __init__(self, operator, track_property, value):
+        """Create track property filter."""
         if operator not in self._managed_operators():
-            raise InvalidOperatorException(f"{operator} is not a valid single song filter operator")
+            raise InvalidOperatorException(f"{operator} is not a valid single track filter operator")
 
         if operator in ["$eq", "$ne", "$gt", "$lt", "$le", "$ge"]:
             self.__method = getattr(ops, operator.lstrip('$'))
@@ -123,14 +124,14 @@ class SongPropertyFilter(SongFilter):
             raise InvalidFilterException(f"{operator} is a valid operator but it is not properly handled")
 
         self.__operator = operator
-        self.__song_property = song_property
+        self.__track_property = track_property
         self.__value = value
 
-    def match(self, song):
-        """Return if the song matches against the filter."""
+    def match(self, track):
+        """Return if the track matches against the filter."""
         # TODO: Make comparisons lowercase and ignoring accents when strings
         # TODO: Raise exception if "gt", "lt", "le", "ge" operations are executed againsts list properties
-        property_value = getattr(song, self.__song_property)
+        property_value = getattr(track, self.__track_property)
         if not isinstance(property_value, list):
             return self.__method(property_value, self.__value)
         else:
@@ -143,20 +144,20 @@ class SongPropertyFilter(SongFilter):
     @property
     def __dict__(self):
         """Return dict representation of the object."""
-        return {self.__operator: {self.__song_property: self.__value}}
+        return {self.__operator: {self.__track_property: self.__value}}
 
 
-class SongAggregateFilter(SongFilter):
-    """Song filter that aggregates multiple song filters with an operator."""
+class TrackAggregateFilter(TrackFilter):
+    """Track filter that aggregates multiple track filters with an operator."""
 
     @staticmethod
     def _managed_operators():
         return ["$and", "$or"]
 
-    def __init__(self, operator, song_filters):
-        """Create song filter that aggregates other filters."""
+    def __init__(self, operator, track_filters):
+        """Create track filter that aggregates other filters."""
         if operator not in self._managed_operators():
-            raise InvalidOperatorException(f"{operator} is not a valid aggregate song filter operator")
+            raise InvalidOperatorException(f"{operator} is not a valid aggregate track filter operator")
 
         if operator == "$and":
             self.__method = all
@@ -165,52 +166,52 @@ class SongAggregateFilter(SongFilter):
         else:
             raise InvalidFilterException(f"{operator} is a valid operator but it is not properly handled")
         self.__operator = operator
-        self.__song_filters = song_filters
+        self.__track_filters = track_filters
 
-    def match(self, song):
-        """Return if the song matches against the filter."""
-        return self.__method([f.match(song) for f in self.__song_filters])
+    def match(self, track):
+        """Return if the track matches against the filter."""
+        return self.__method([f.match(track) for f in self.__track_filters])
 
     @classmethod
     def _fromComponents(cls, operator, value):
-        return cls(operator, [SongFilter.fromDict(d) for d in value])
+        return cls(operator, [TrackFilter.fromDict(d) for d in value])
 
     @property
     def __dict__(self):
         """Return dict representation of the object."""
-        return {self.__operator: [f.__dict__ for f in self.__song_filters]}
+        return {self.__operator: [f.__dict__ for f in self.__track_filters]}
 
 
-class SongNotFilter(SongFilter):
-    """Song filter that negates other song filter."""
+class TrackNotFilter(TrackFilter):
+    """Track filter that negates other track filter."""
 
     @staticmethod
     def _managed_operators():
         return ["$not"]
 
-    def __init__(self, song_filter):
-        """Create song filter negation filter."""
-        self.__song_filter = song_filter
+    def __init__(self, track_filter):
+        """Create track filter negation filter."""
+        self.__track_filter = track_filter
 
-    def match(self, song):
-        """Return if the song matches against the filter."""
-        return not self.__song_filter.match(song)
+    def match(self, track):
+        """Return if the track matches against the filter."""
+        return not self.__track_filter.match(track)
 
     @classmethod
     def _fromComponents(cls, operator, value):
-        return cls(SongFilter.fromDict(value))
+        return cls(TrackFilter.fromDict(value))
 
     @property
     def __dict__(self):
         """Return dict representation of the object."""
-        return {"$not": self.__song_filter.__dict__}
+        return {"$not": self.__track_filter.__dict__}
 
 
-class Song(object):
-    """Song entity class."""
+class Track(object):
+    """Track entity class."""
 
     def __init__(self, name, isrc, album, release_year, language, artists, genres):
-        """Create song entity."""
+        """Create track entity."""
         self.__name = name
         self.__isrc = isrc
         self.__album = album
@@ -223,48 +224,48 @@ class Song(object):
         if self.__genres is None:
             self.__genres = []
 
-    def match_filter(self, song_filter):
-        """Check if the song matches against a filter."""
-        return song_filter.match(self)
+    def match_filter(self, track_filter):
+        """Check if the track matches against a filter."""
+        return track_filter.match(self)
 
     @property
     def name(self):
-        """Get song name."""
+        """Get track name."""
         return self.__name
 
     @property
     def isrc(self):
-        """Get song ISRC."""
+        """Get track ISRC."""
         return self.__isrc
 
     @property
     def album(self):
-        """Get song album."""
+        """Get track album."""
         return self.__album
 
     @property
     def release_year(self):
-        """Get song release year."""
+        """Get track release year."""
         return self.__release_year
 
     @property
     def language(self):
-        """Get song language."""
+        """Get track language."""
         return self.__language
 
     @property
     def artists(self):
-        """Get song artists."""
+        """Get track artists."""
         return self.__artists
 
     @property
     def genres(self):
-        """Get song genres."""
+        """Get track genres."""
         return self.__genres
 
     @property
     def __dict__(self):
-        """Get dict representation of the song."""
+        """Get dict representation of the track."""
         return {
             "name": self.__name,
             "isrc": self.__isrc,
@@ -276,28 +277,28 @@ class Song(object):
         }
 
 
-class SpotifySong(Song):
-    """Song entity class with references to internal Spotify id."""
+class SpotifyTrack(Track):
+    """Track entity class with references to internal Spotify id."""
 
     def __init__(self, uri, href, name, isrc, album, release_year, language, artists, genres):
-        """Create Spotify song entity."""
+        """Create Spotify track entity."""
         self.__uri = uri
         self.__href = href
         super().__init__(name, isrc, album, release_year, language, artists, genres)
 
     @property
     def uri(self):
-        """Get Spotify song uri."""
+        """Get Spotify track uri."""
         return self.__uri
 
     @property
     def href(self):
-        """Get Spotify song href."""
+        """Get Spotify track href."""
         return self.__href
 
     @property
     def __dict__(self):
-        """Get dict representation of the Spotify song."""
+        """Get dict representation of the Spotify track."""
         super_dict = super().__dict__
         super_dict.update({
             "uri": self.__uri,

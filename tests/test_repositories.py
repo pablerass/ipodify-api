@@ -3,7 +3,7 @@ import pytest
 
 from ipodify_api.model.user import User
 from ipodify_api.model.playlist import Playlist
-from ipodify_api.model.song import SongPropertyFilter
+from ipodify_api.model.track import TrackPropertyFilter
 
 from ipodify_api.repositories.memory import MemoryRepository, filter_match
 from ipodify_api.repositories.sql import SQLRepository, EntityMap, UserMap, PlaylistMap
@@ -12,7 +12,7 @@ from ipodify_api.repositories.sql import SQLRepository, EntityMap, UserMap, Play
 def test_filter_match():
     assert filter_match({"name": "a"}, User("a"))
     assert filter_match({"name": "a", "owner": User("b")},
-                        Playlist("a", User("b"), SongPropertyFilter("$eq", "album", "Veneno")))
+                        Playlist("a", User("b"), TrackPropertyFilter("$eq", "album", "Veneno")))
 
 
 def test_entity_map():
@@ -44,10 +44,10 @@ def test_repository_with_simple_entity(repository):
 def test_repository_with_composed_entity(repository):
     user = User("a")
     repository.add(user)
-    playlist = Playlist("b", User("a"), SongPropertyFilter("$eq", "album", "Veneno"))
+    playlist = Playlist("b", User("a"), TrackPropertyFilter("$eq", "album", "Veneno"))
     print(playlist)
     repository.add(playlist)
-    playlist.song_filter = SongPropertyFilter("$eq", "album", "Agila")
+    playlist.track_filter = TrackPropertyFilter("$eq", "album", "Agila")
     same_playlist = repository.find_by_id(Playlist, "a:b")
     print(same_playlist)
     repository.update(playlist)

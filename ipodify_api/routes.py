@@ -7,8 +7,8 @@ from flask import Blueprint, abort, request
 
 from .gateways.spotify import SpotifyPort, spotify_auth
 from .schemas import body_schema
-from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
-                       RemovePlaylistUseCase
+from .use_cases import GetFilterPreviewUseCase, GetLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, \
+                       GetPlaylistUseCase, RemovePlaylistUseCase
 
 
 api = Blueprint('api', __name__)
@@ -24,11 +24,25 @@ def get_me(spotify_user):
 
 @api.route('/library', methods=['GET'])
 @auth
-@inject.params(get_user_track_library_use_case=GetUserTrackLibraryUseCase)
-def get_library(spotify_user, get_user_track_library_use_case):
+@inject.params(get_library_use_case=GetLibraryUseCase)
+def get_library(spotify_user, get_library_use_case):
     """Get library endpoint."""
-    songs = get_user_track_library_use_case.execute(spotify_user)
-    return {"songs": songs}
+    tracks = get_library_use_case.execute(spotify_user)
+    return {"tracks": tracks}
+
+
+@api.route('/filter_preview', methods=['GET'])
+@body_schema("filter")
+@auth
+@inject.params(get_filter_preview_use_case=GetFilterPreviewUseCase)
+def get_filter_preview(spotify_user, get_filter_preview_use_case):
+    """Get filter preview endpoint."""
+    filter_dict = request.json
+    tracks = GetFilterPreviewUseCase.execute(spotify_user, filter_dict)
+    return {
+        "filter": filter_dict,
+        "tracks": tracks
+    }
 
 
 @api.route('/playlists', methods=['GET'])

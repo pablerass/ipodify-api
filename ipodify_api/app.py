@@ -9,8 +9,8 @@ from werkzeug.exceptions import HTTPException
 from .error import handle_http_exception
 from .gateways.spotify import SpotifyPort
 from .repositories.memory import MemoryRepository
-from .use_cases import GetUserTrackLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, GetPlaylistUseCase, \
-                       RemovePlaylistUseCase
+from .use_cases import GetFilterPreviewUseCase, GetLibraryUseCase, GetPlaylistsUseCase, \
+                       AddPlaylistUseCase, GetPlaylistUseCase, RemovePlaylistUseCase
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -28,9 +28,11 @@ def app_config(binder):
     """Configure app inject bindings."""
     spotify_port = SpotifyPort()
     repository = MemoryRepository()
+    get_library_use_case = GetLibraryUseCase(spotify_port)
 
     binder.bind(SpotifyPort, spotify_port)
-    binder.bind(GetUserTrackLibraryUseCase, GetUserTrackLibraryUseCase(spotify_port))
+    binder.bind(GetLibraryUseCase, get_library_use_case)
+    binder.bind(GetFilterPreviewUseCase, GetFilterPreviewUseCase(spotify_port))
     binder.bind(GetPlaylistsUseCase, GetPlaylistsUseCase(repository))
     binder.bind(GetPlaylistUseCase, GetPlaylistUseCase(repository))
     binder.bind(AddPlaylistUseCase, AddPlaylistUseCase(repository))

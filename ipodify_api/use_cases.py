@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from .model.playlist import Playlist
 from .model.user import User
-from .model.song import SongFilter, SpotifySong
+from .model.track import TrackFilter, SpotifyTrack
 
 
 class PersistenceUseCase(object):
@@ -31,7 +31,7 @@ class PersistenceUseCase(object):
         return user
 
 
-class GetUserTrackLibraryUseCase(object):
+class GetLibraryUseCase(object):
     """Get user library use case."""
 
     def __init__(self, spotify_port):
@@ -56,7 +56,7 @@ class GetUserTrackLibraryUseCase(object):
         tracks = []
         albums_dict = defaultdict(list)
         artists_dict = defaultdict(list)
-        # TODO: Do not add local songs
+        # TODO: Do not add local tracks
         for track in self.__spotify_port.get_library_tracks(spotify_user):
             album = track.get('album')
             artists = track.get('artists')
@@ -87,7 +87,24 @@ class GetUserTrackLibraryUseCase(object):
                 track['genres'].extend([g for g in artist.get('genres') if g not in track['genres']])
 
         # TODO: See if it is a good option to improve this
-        return [SpotifySong(**t) for t in tracks]
+        return [SpotifyTrack(**t) for t in tracks]
+
+
+class GetFilterPreviewUseCase(object):
+    """Get filter preview use case."""
+
+    def __init__(self, get_user_track_library_user_case):
+        """Create get library use case."""
+        super().__init__()
+        self.__get_user_track_library_user_case = get_user_track_library_user_case
+
+    def execute(self, spotify_user, filter_dict):
+        """Execute use case."""
+        track_filter = TrackFilter.fromDict(filter_dict)
+        tracks = self.__get_user_track_library_user_case.execute(spotify_user)
+
+        # TODO: See if it is a good option to improve this
+        return [t for t in tracks if t.match_filter(track_filter)]
 
 
 class GetPlaylistsUseCase(PersistenceUseCase):
@@ -105,11 +122,11 @@ class GetPlaylistsUseCase(PersistenceUseCase):
 class AddPlaylistUseCase(PersistenceUseCase):
     """Add playlist use case."""
 
-    def execute(self, playlist_name, user_name, song_filter_dict):
+    def execute(self, playlist_name, user_name, track_filter_dict):
         """Execute use case."""
         user = self.get_user(user_name)
-        song_filter = SongFilter.fromDict(song_filter_dict)
-        playlist = Playlist(playlist_name, user, song_filter)
+        track_filter = TrackFilter.fromDict(track_filter_dict)
+        playlist = Playlist(playlist_name, user, track_filter)
         self.repository.add(playlist)
         return playlist
 

@@ -14,12 +14,12 @@ class PlaylistVisibility(enum.Enum):
 class Playlist(Identifiable):
     """Playlist entity class."""
 
-    def __init__(self, name, owner, song_filter, visibility=PlaylistVisibility.PRIVATE):
+    def __init__(self, name, owner, track_filter, visibility=PlaylistVisibility.PRIVATE):
         """Create playlist entity."""
         self.__name = name
         self.__owner = owner
         self.__visibility = visibility
-        self.__song_filter = song_filter
+        self.__track_filter = track_filter
 
     @property
     def name(self):
@@ -42,14 +42,14 @@ class Playlist(Identifiable):
         self.__visibility = visibility
 
     @property
-    def song_filter(self):
-        """Get playlist songs filter."""
-        return self.__song_filter
+    def track_filter(self):
+        """Get playlist tracks filter."""
+        return self.__track_filter
 
-    @song_filter.setter
-    def song_filter(self, song_filter):
-        """Set playlist songs filter."""
-        self.__song_filter = song_filter
+    @track_filter.setter
+    def track_filter(self, track_filter):
+        """Set playlist tracks filter."""
+        self.__track_filter = track_filter
 
     @property
     def id(self):
@@ -63,7 +63,7 @@ class Playlist(Identifiable):
             'name': self.__name,
             'owner': self.__owner.name,
             'visibility': self.__visibility.value,
-            'filter': self.__song_filter.__dict__
+            'filter': self.__track_filter.__dict__
         }
 
     def __repr__(self):

@@ -29,7 +29,8 @@ def validate_schema_data(data, schema_name):
         validate(data, schema, resolver=resolver)
 
 
-def body_schema(schema_name):
+# TUNE: This is not useful as some required requests values are obtained via other decorators or parts of the request
+def request_schema(schema_name):
     """Validate payload schema."""
     def caller(func):
         @wraps(func)

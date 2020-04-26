@@ -139,7 +139,7 @@ class GetPlaylistUseCase(PersistenceUseCase):
         user = self.get_user(user_name)
         playlists = self.repository.find_by_filter(Playlist, {"owner": user, "name": playlist_name})
         if not playlists:
-            return {}
+            return None
         return playlists[0]
 
 
@@ -151,6 +151,6 @@ class RemovePlaylistUseCase(PersistenceUseCase):
         user = self.get_user(user_name)
         playlists = self.repository.find_by_filter(Playlist, {"owner": user, "name": playlist_name})
         if not playlists:
-            return {}
+            return None
         self.repository.remove(playlists[0])
         return playlists[0]

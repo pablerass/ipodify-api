@@ -3,74 +3,77 @@
 import inject
 
 from functools import partial
-from flask import Blueprint, abort, request
+from flask import Blueprint, abort, request, make_response, jsonify
 
 from .gateways.spotify import SpotifyGateway, spotify_auth
-from .schemas import body_schema
+from .schemas import request_schema
 from .use_cases import GetFilterPreviewUseCase, GetLibraryUseCase, GetPlaylistsUseCase, AddPlaylistUseCase, \
                        GetPlaylistUseCase, RemovePlaylistUseCase
 
 
 api = Blueprint('api', __name__)
-auth = partial(spotify_auth(inject.instance(SpotifyGateway)))
+spotify_auth = partial(spotify_auth(inject.instance(SpotifyGateway)))
 
 
 @api.route('/me', methods=['GET'])
-@auth
+@spotify_auth
 def get_me(spotify_user):
     """Get library endpoint."""
-    return {"id": spotify_user.name}
+    return jsonify({"id": spotify_user.name})
 
 
 @api.route('/library', methods=['GET'])
-@auth
+@spotify_auth
 @inject.params(get_library_use_case=GetLibraryUseCase)
 def get_library(spotify_user, get_library_use_case):
     """Get library endpoint."""
     tracks = get_library_use_case.execute(spotify_user)
-    return {"tracks": tracks}
+    return jsonify({"tracks": tracks})
 
 
 @api.route('/filter_preview', methods=['GET'])
-@body_schema("filter")
-@auth
+@request_schema("filter")
+@spotify_auth
 @inject.params(get_filter_preview_use_case=GetFilterPreviewUseCase)
 def get_filter_preview(spotify_user, get_filter_preview_use_case):
     """Get filter preview endpoint."""
     filter_dict = request.json
     tracks = GetFilterPreviewUseCase.execute(spotify_user, filter_dict)
-    return {
+    return jsonify({
         "filter": filter_dict,
         "tracks": tracks
-    }
+    })
 
 
 @api.route('/playlists', methods=['GET'])
-@auth
+@spotify_auth
 @inject.params(get_playlists_use_case=GetPlaylistsUseCase)
 def get_playlists(spotify_user, get_playlists_use_case):
     """Get playlists endpoint."""
     playlists = get_playlists_use_case.execute(spotify_user.name)
-    return {
+    return jsonify({
         'playlists': playlists
-    }
+    })
 
 
 @api.route('/playlists', methods=['POST'])
-@body_schema("playlist")
-@auth
+@spotify_auth
+@request_schema("playlist")
 @inject.params(add_playlist_use_case=AddPlaylistUseCase)
 def add_playlist(spotify_user, add_playlist_use_case):
     """Add playlists endpoint."""
+    # TODO: Make this fail with 409 Conflict or similar if playlist already exists
     request_content = request.json
     playlist = add_playlist_use_case.execute(request_content['name'], spotify_user.name, request_content['filter'])
-    # TODO: Move this to a jsonable class
-    return playlist.__dict__
+
+    response = make_response(jsonify(playlist.__dict__), 201)
+    response.headers['Location'] = f"/playlists/{request_content['name']}"
+    return response
 
 
 @api.route('/playlists/<name>', methods=['PUT'])
-@body_schema("playlist")
-@auth
+@spotify_auth
+@request_schema("playlist")
 @inject.params(add_playlist_use_case=AddPlaylistUseCase)
 def set_playlist(spotify_user, add_playlist_use_case, name):
     """Set playlist endpoint."""
@@ -82,27 +85,26 @@ def set_playlist(spotify_user, add_playlist_use_case, name):
         abort(422)
     # TODO: Try and catch error if user playlist with that name already exist
     playlist = add_playlist_use_case.execute(spotify_user.name, name)
-    # TODO: Move this to a jsonable class
-    return playlist.__dict__
+    return jsonify(playlist)
 
 
 @api.route('/playlists/<name>', methods=['GET'])
-@auth
+@spotify_auth
 @inject.params(get_playlist_use_case=GetPlaylistUseCase)
 def get_playlist(spotify_user, get_playlist_use_case, name):
     """Add playlist endpoint."""
     playlist = get_playlist_use_case.execute(spotify_user.name, name)
-    if not playlist:
+    if playlist is None:
         abort(404)
-    # TODO: Move this to a jsonable class
-    return playlist.__dict__
+    return jsonify(playlist)
 
 
 @api.route('/playlists/<name>', methods=['DELETE'])
-@auth
+@spotify_auth
 @inject.params(remove_playlist_use_case=RemovePlaylistUseCase)
 def remove_playlist(spotify_user, remove_playlist_use_case, name):
     """Remove playlist endpoint."""
-    if not remove_playlist_use_case.execute(spotify_user.name, name):
+    playlist = remove_playlist_use_case.execute(spotify_user.name, name)
+    if playlist is None:
         abort(404)
-    return ""
+    return jsonify(playlist)

@@ -17,5 +17,5 @@
       "$ref": "filter.schema.json"
     }
   },
-  "requiredProperties": ["name", "owner", "filter"]
+  "_required": ["name", "owner", "filter"]
 }

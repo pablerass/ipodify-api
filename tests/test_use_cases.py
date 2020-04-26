@@ -37,6 +37,7 @@ def spotify_user():
 
 def test_playlist_use_cases(repository):
     add_playlist = AddPlaylistUseCase(repository)
+    get_playlist = GetPlaylistUseCase(repository)
     get_playlists = GetPlaylistsUseCase(repository)
     remove_playlist = RemovePlaylistUseCase(repository)
 
@@ -49,6 +50,7 @@ def test_playlist_use_cases(repository):
 
     add_playlist.execute(playlist_name, user_name, filter_dict)
     assert get_playlists.execute(user_name) == [playlist]
+    assert get_playlist.execute(user_name, "b") == None
     remove_playlist.execute(user_name, playlist_name)
     assert get_playlists.execute(user_name) == []
 

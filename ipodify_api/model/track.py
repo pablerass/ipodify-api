@@ -2,11 +2,8 @@
 """Track model objects package."""
 from abc import ABCMeta, abstractmethod
 
-import json
 import operator as ops
 import re
-
-from . import Hasheable, JSONSerializable
 
 
 class InvalidOperatorException(Exception):
@@ -21,14 +18,14 @@ class InvalidFilterException(Exception):
     pass
 
 
-class InvalidJsonTrackFilterException(Exception):
-    """Exception raise when a json string is not a valid track filter representation."""
+class InvalidTrackFilterDictException(Exception):
+    """Exception raise when a dict a valid track filter representation."""
 
     pass
 
 
 # TODO: Track filter could be generalized as property filter
-class TrackFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
+class TrackFilter(metaclass=ABCMeta):
     """Abstract track filter class."""
 
     @staticmethod
@@ -41,22 +38,13 @@ class TrackFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
         """Return if the track matches against the filter."""
         pass
 
-    def toJSON(self):
-        """Convert to json string."""
-        return json.dumps(self.__dict__)
-
     @staticmethod
     def _decompose_filter(filter_dict):
         if len(filter_dict) != 1:
-            raise InvalidJsonTrackFilterException(f"{filter_dict} has more than one key")
+            raise InvalidTrackFilterDictException(f"{filter_dict} has more than one key")
         operator = list(filter_dict)[0]
         value = filter_dict[operator]
         return operator, value
-
-    @classmethod
-    def fromJSON(cls, json_string):
-        """Create object from json string."""
-        return cls.fromDict(json.loads(json_string))
 
     @classmethod
     def fromDict(cls, filter_dict):
@@ -69,11 +57,7 @@ class TrackFilter(Hasheable, JSONSerializable, metaclass=ABCMeta):
         for _class in cls.__subclasses__():
             if operator in _class._managed_operators():
                 return _class._fromComponents(operator, value)
-        raise InvalidJsonTrackFilterException()
-
-    def __hash__(self):
-        """Return hash."""
-        return hash(self.toJSON())
+        raise InvalidTrackFilterDictException()
 
     @property
     @abstractmethod

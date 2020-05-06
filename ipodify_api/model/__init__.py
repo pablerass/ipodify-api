@@ -29,18 +29,3 @@ class Identifiable(Hasheable, metaclass=ABCMeta):
     def __hash__(self):
         """Return hash."""
         return hash(self.id)
-
-
-class JSONSerializable(metaclass=ABCMeta):
-    """JSON serialiable abstract class definition."""
-
-    @abstractmethod
-    def toJSON(self):
-        """Convert to json string."""
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def fromJSON(json_string):
-        """Create object from json string."""
-        pass

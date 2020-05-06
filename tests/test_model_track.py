@@ -96,5 +96,4 @@ def test_track_filter_json():
     composed_filter_dict = {"$not": {"$and": [{"$ge": {"release_year": 2000}},
                                               {"$not": {"$lt": {"release_year": 2010}}}]}}
     assert composed_filter.__dict__ == composed_filter_dict
-    assert composed_filter.toJSON() == json.dumps(composed_filter_dict)
-    assert TrackFilter.fromJSON(json.dumps(composed_filter_dict)) == composed_filter
+    assert TrackFilter.fromDict(composed_filter_dict).__dict__ == composed_filter_dict

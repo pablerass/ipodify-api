@@ -4,6 +4,7 @@ from flask import request
 from functools import wraps
 
 from ..model import Hasheable
+from ..model.user import User
 
 import requests
 
@@ -14,28 +15,18 @@ class SpotifyNotAuthenticatedError(Exception):
     pass
 
 
-# TUNE: Maybe this object should be moved to model
-class SpotifyUser(Hasheable):
+class SpotifyUser(User):
     """Spotify user."""
 
     def __init__(self, name, authorization):
         """Create Spotify user with its authorization header."""
-        self.__name = name
         self.__authorization = authorization
-
-    @property
-    def name(self):
-        """Get user name."""
-        return self.__name
+        super().__init__(name)
 
     @property
     def authorization(self):
         """Get user authorization header."""
         return self.__authorization
-
-    def __hash__(self):
-        """Return hash."""
-        return hash(self.__name)
 
 
 def spotify_auth(spotify_gateway):

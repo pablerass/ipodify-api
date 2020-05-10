@@ -25,6 +25,7 @@ class User(Identifiable):
         """Get dict representation of the user."""
         return {
             'name': self.__name,
+            'playlists': self.__playlists
         }
 
     def __repr__(self):

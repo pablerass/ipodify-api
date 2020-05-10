@@ -13,9 +13,9 @@
       "enum": ["private"],
       "default": "private"
     },
-    "filter": {
+    "track_filter": {
       "$ref": "filter.schema.json"
     }
   },
-  "_required": ["name", "owner", "filter"]
+  "_required": ["name", "owner", "track_filter"]
 }

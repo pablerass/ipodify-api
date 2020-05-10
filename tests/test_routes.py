@@ -47,7 +47,7 @@ def test_playlist(client):
     # TUNE: Here test are almost duplicating the ones defined in test_use_case.py
     playlist_invalid_dict = {
         "name": "a",
-        "filter": {
+        "track_filter": {
             "$and": [
                 {"$eq": {"album": "Veneno"}},
                 {"$equ": {"release_year": 2010}}
@@ -63,7 +63,7 @@ def test_playlist(client):
 
     playlist_dict = {
         "name": "a",
-        "filter": {
+        "track_filter": {
             "$and": [
                 {"$eq": {"album": "Veneno"}},
                 {"$eq": {"release_year": 2010}}
@@ -94,7 +94,3 @@ def test_playlist(client):
     response = client.delete('/playlists/a')
     assert response.status_code == 200
     assert response.json == playlist_response_dict
-
-    response = client.get('/playlists')
-    assert response.status_code == 200
-    assert response.json == {"playlists": []}

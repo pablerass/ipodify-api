@@ -37,10 +37,10 @@ def get_library(spotify_user, get_library_use_case):
 @inject.params(get_filter_preview_use_case=GetFilterPreviewUseCase)
 def get_filter_preview(spotify_user, get_filter_preview_use_case):
     """Get filter preview endpoint."""
-    filter_dict = request.json
-    tracks = GetFilterPreviewUseCase.execute(spotify_user, filter_dict)
+    track_filter_dict = request.json
+    tracks = GetFilterPreviewUseCase.execute(spotify_user, track_filter_dict)
     return jsonify({
-        "filter": filter_dict,
+        "track_filter": track_filter_dict,
         "tracks": tracks
     })
 
@@ -64,7 +64,9 @@ def add_playlist(spotify_user, add_playlist_use_case):
     """Add playlists endpoint."""
     # TODO: Make this fail with 409 Conflict or similar if playlist already exists
     request_content = request.json
-    playlist = add_playlist_use_case.execute(request_content['name'], spotify_user.name, request_content['filter'])
+    # TODO: Make this use cases receive a single dict that can be matched against the schema
+    playlist = add_playlist_use_case.execute(request_content['name'], spotify_user.name,
+                                             request_content['track_filter'])
 
     response = make_response(jsonify(playlist.__dict__), 201)
     response.headers['Location'] = f"/playlists/{request_content['name']}"

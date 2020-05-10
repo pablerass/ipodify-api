@@ -18,7 +18,6 @@ class CustomJSONEncoder(JSONEncoder):
 
     def default(self, obj):
         """Get default JSON Encode value."""
-        # TODO: Create JsonSerializable class to be used here
         if hasattr(obj, '__dict__'):
             return obj.__dict__
         return obj

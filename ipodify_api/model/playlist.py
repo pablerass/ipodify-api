@@ -63,7 +63,7 @@ class Playlist(Identifiable):
             'name': self.__name,
             'owner': self.__owner.name,
             'visibility': self.__visibility.value,
-            'filter': self.__track_filter.__dict__
+            'track_filter': self.__track_filter.__dict__
         }
 
     def __repr__(self):

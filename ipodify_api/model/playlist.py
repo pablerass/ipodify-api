@@ -21,6 +21,8 @@ class Playlist(Identifiable):
         self.__visibility = visibility
         self.__track_filter = track_filter
 
+        owner.add_playlist(self)
+
     @property
     def name(self):
         """Get playlist name."""

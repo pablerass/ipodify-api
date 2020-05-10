@@ -65,6 +65,10 @@ class TrackFilter(metaclass=ABCMeta):
         """Return dict representation of the object."""
         pass
 
+    def __eq__(self, other):
+        """Return if this object is equal to other."""
+        return self.__dict__ == other.__dict__
+
 
 # TODO: Add class to composite playlists
 # class TrackInsidePlaylistFilter(TrackFiler):

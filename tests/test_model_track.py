@@ -3,7 +3,9 @@ import pytest
 
 import json
 
+from ipodify_api.model.playlist import Playlist
 from ipodify_api.model.track import Track, TrackFilter, TrackAggregateFilter, TrackPropertyFilter, TrackNotFilter
+from ipodify_api.model.user import User
 
 
 def test_property_filters():
@@ -97,3 +99,14 @@ def test_track_filter_json():
                                               {"$not": {"$lt": {"release_year": 2010}}}]}}
     assert composed_filter.__dict__ == composed_filter_dict
     assert TrackFilter.fromDict(composed_filter_dict).__dict__ == composed_filter_dict
+    assert TrackFilter.fromDict(composed_filter_dict).__dict__ == composed_filter_dict
+    assert TrackFilter.fromDict(composed_filter_dict) == composed_filter
+
+
+def test_playlists(basic_filter):
+    user = User("user")
+    playlist1 = Playlist("playlist1", user, basic_filter)
+    playlist2 = Playlist("playlist2", user, basic_filter)
+    playlist3 = Playlist("playlist3", user, basic_filter)
+
+    assert user.playlists == [playlist1, playlist2, playlist3]
